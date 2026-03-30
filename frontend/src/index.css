@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ Theme variables */
+@layer base {
+  :root {
+    --background: 249 250 251;
+    --foreground: 15 23 42;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
+    --primary: 88 80 236;
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 88 80 236;
+
+    --sidebar-background: 88 80 236;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-hover: 74 66 201;
+    --sidebar-border: 255 255 255 0.1;
+
+    --dashboard-bg: 249 250 251;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
