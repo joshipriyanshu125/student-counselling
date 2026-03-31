@@ -1,29 +1,26 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
 
-const {
+import {
     createFeedback,
     getCounsellorFeedback,
     getStudentFeedback,
     getSessionFeedback,
-} = require("../controllers/feedbackController");
+} from "../controllers/feedbackController.js";
 
-const {
+import {
     protect,
     allowStudent,
     allowCounsellor,
-} = require("../middleware/authMiddleware");
+} from "../middleware/authMiddleware.js";
 
-// Student submits feedback for a session
+const router = express.Router();
+
 router.post("/feedback", protect, allowStudent, createFeedback);
 
-// Student views all feedback they have left
 router.get("/feedback/student", protect, allowStudent, getStudentFeedback);
 
-// Counsellor views all feedback left for their sessions
 router.get("/feedback/my", protect, allowCounsellor, getCounsellorFeedback);
 
-// Student/Counsellor views feedback for a specific session
 router.get("/feedback/session/:sessionId", protect, getSessionFeedback);
 
-module.exports = router;
+export default router;

@@ -1,9 +1,7 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import Appointment from "../models/Appointment.js";
 
-const Appointment = require("../models/Appointment"); // ✅ ADD THIS
-
-const {
+import {
     bookAppointment,
     getMyAppointments,
     getCounsellorAppointments,
@@ -12,17 +10,16 @@ const {
     startMeeting,
     getAppointmentByRoomId,
     endMeeting,
-} = require("../controllers/appointmentController");
+} from "../controllers/appointmentController.js";
 
-const {
+import {
     protect,
     allowStudent,
     allowCounsellor,
-} = require("../middleware/authMiddleware");
+} from "../middleware/authMiddleware.js";
 
-// ===============================
-// ✅ VALIDATE MEETING ACCESS (NEW)
-// ===============================
+const router = express.Router();
+
 router.get("/appointments/room/:roomId", protect, async (req, res) => {
     try {
         const appointment = await Appointment.findOne({
@@ -39,28 +36,18 @@ router.get("/appointments/room/:roomId", protect, async (req, res) => {
         const now = new Date();
         const meetingEnd = new Date(meetingStart.getTime() + 60 * 60 * 1000);
 
-        // ❌ BLOCK: Completed
         if (appointment.status === "completed") {
-            return res.status(400).json({
-                message: "Meeting already completed",
-            });
+            return res.status(400).json({ message: "Meeting already completed" });
         }
 
-        // ❌ BLOCK: Not started
         if (now < meetingStart) {
-            return res.status(400).json({
-                message: "Meeting has not started yet",
-            });
+            return res.status(400).json({ message: "Meeting has not started yet" });
         }
 
-        // ❌ BLOCK: Expired
         if (now > meetingEnd) {
-            return res.status(400).json({
-                message: "Meeting has already ended",
-            });
+            return res.status(400).json({ message: "Meeting has already ended" });
         }
 
-        // ✅ ALLOW
         res.json({
             success: true,
             data: appointment,
@@ -68,69 +55,22 @@ router.get("/appointments/room/:roomId", protect, async (req, res) => {
 
     } catch (error) {
         console.error("Validation error:", error);
-        res.status(500).json({
-            message: "Server error",
-        });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
-// ===============================
-// EXISTING ROUTES (UNCHANGED)
-// ===============================
+router.get("/counsellors", protect, getCounsellors);
 
-// Get counsellors
-router.get(
-    "/counsellors",
-    protect,
-    getCounsellors
-);
+router.post("/appointments", protect, allowStudent, bookAppointment);
 
-// Book appointment (student)
-router.post(
-    "/appointments",
-    protect,
-    allowStudent,
-    bookAppointment
-);
+router.get("/appointments/my", protect, allowStudent, getMyAppointments);
 
-// Get logged-in student's appointments
-router.get(
-    "/appointments/my",
-    protect,
-    allowStudent,
-    getMyAppointments
-);
+router.get("/appointments/counsellor", protect, allowCounsellor, getCounsellorAppointments);
 
-// Get counsellor appointments
-router.get(
-    "/appointments/counsellor",
-    protect,
-    allowCounsellor,
-    getCounsellorAppointments
-);
+router.patch("/appointments/:id", protect, allowCounsellor, updateAppointmentStatus);
 
-// Update appointment status
-router.patch(
-    "/appointments/:id",
-    protect,
-    allowCounsellor,
-    updateAppointmentStatus
-);
+router.post("/appointments/:id/start-meeting", protect, allowCounsellor, startMeeting);
 
-// Start meeting (counsellor)
-router.post(
-    "/appointments/:id/start-meeting",
-    protect,
-    allowCounsellor,
-    startMeeting
-);
+router.patch("/appointments/:id/end-meeting", protect, allowCounsellor, endMeeting);
 
-// End meeting (counsellor)
-router.patch(
-    "/appointments/:id/end-meeting",
-    protect,
-    allowCounsellor,
-    endMeeting
-);
-
-module.exports = router;
+export default router;

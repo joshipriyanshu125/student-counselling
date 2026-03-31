@@ -1,6 +1,7 @@
-const express = require("express")
-const router = express.Router()
-const User = require("../models/User")
+import express from "express";
+import User from "../models/User.js";
+
+const router = express.Router();
 
 // approve counsellor
 router.put("/approve/:id", async (req, res) => {
@@ -8,13 +9,13 @@ router.put("/approve/:id", async (req, res) => {
         req.params.id,
         { isApproved: true },
         { new: true }
-    )
+    );
 
     res.json({
         success: true,
         message: "Counsellor approved",
         data: user
-    })
-})
+    });
+});
 
-module.exports = router
+export default router;

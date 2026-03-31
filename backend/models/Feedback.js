@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const feedbackSchema = new mongoose.Schema(
     {
@@ -37,4 +37,4 @@ const feedbackSchema = new mongoose.Schema(
 
 feedbackSchema.index({ session: 1, student: 1 }, { unique: true });
 
-module.exports = mongoose.model("Feedback", feedbackSchema);
+export default mongoose.model("Feedback", feedbackSchema);

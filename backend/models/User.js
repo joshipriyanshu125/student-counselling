@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
@@ -45,16 +45,13 @@ const userSchema = new mongoose.Schema(
             default: "student",
         },
 
-        // ✅ NEW: Approval system for counsellor
         isApproved: {
             type: Boolean,
             default: function () {
-                // auto approve students & admins
                 return this.role !== "counsellor";
             },
         },
 
-        // Counsellor specific
         specialization: {
             type: String,
             default: "",
@@ -70,4 +67,4 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);

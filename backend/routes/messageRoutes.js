@@ -1,5 +1,5 @@
-const express = require("express");
-const Message = require("../models/Message");
+import express from "express";
+import Message from "../models/Message.js";
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.get("/:roomId", async (req, res) => {
     res.json(messages);
 });
 
-module.exports = router;
+export default router;

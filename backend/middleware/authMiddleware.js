@@ -1,11 +1,9 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-
-exports.protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
     try {
         let token;
-
 
         if (
             req.headers.authorization &&
@@ -20,9 +18,7 @@ exports.protect = async (req, res, next) => {
             });
         }
 
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
 
         req.user = await User.findById(decoded.id).select("-password");
 
@@ -40,10 +36,7 @@ exports.protect = async (req, res, next) => {
     }
 };
 
-
-
-
-exports.allowStudent = (req, res, next) => {
+export const allowStudent = (req, res, next) => {
     if (req.user.role !== "student") {
         return res.status(403).json({
             message: "Access denied. Students only.",
@@ -52,9 +45,7 @@ exports.allowStudent = (req, res, next) => {
     next();
 };
 
-
-
-exports.allowCounsellor = (req, res, next) => {
+export const allowCounsellor = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({
             message: "Not authorized",
@@ -68,9 +59,7 @@ exports.allowCounsellor = (req, res, next) => {
     next();
 };
 
-
-
-exports.allowAdmin = (req, res, next) => {
+export const allowAdmin = (req, res, next) => {
     if (req.user.role !== "admin") {
         return res.status(403).json({
             message: "Access denied. Admins only.",

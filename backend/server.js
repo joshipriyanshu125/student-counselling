@@ -1,16 +1,30 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const connectDB = require("./config/db");
-const http = require("http");
-const { Server } = require("socket.io");
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
 
-const errorHandler = require("./middleware/errorMiddleware");
-const { protect } = require("./middleware/authMiddleware");
+import connectDB from "./config/db.js";
+import errorHandler from "./middleware/errorMiddleware.js";
+import { protect } from "./middleware/authMiddleware.js";
 
-// Socket + Chat
-const socketHandler = require("./sockets/socket");
-const messageRoutes = require("./routes/messageRoutes");
+// Routes
+import authRoutes from "./routes/authRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+import protectedRoutes from "./routes/protectedRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
+import counsellorRoutes from "./routes/counsellorRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+
+// Socket
+import socketHandler from "./sockets/socket.js";
+
+dotenv.config();
 
 const app = express();
 
@@ -37,7 +51,7 @@ app.use(
 // Body Parser
 app.use(express.json());
 
-/* ================= PROFILE ROUTES (UNCHANGED) ================= */
+/* ================= PROFILE ROUTES ================= */
 
 app.all("/api/profile", protect, async (req, res) => {
     const u = req.user;
@@ -53,7 +67,7 @@ app.all("/api/profile", protect, async (req, res) => {
         });
     }
 
-    if (req.method === "PUT" || req.method === "PATCH" || req.method === "POST") {
+    if (["PUT", "PATCH", "POST"].includes(req.method)) {
         try {
             const { name, fullName, email, phone, studentId, program } = req.body || {};
 
@@ -101,6 +115,7 @@ app.post("/api/profile-save", protect, async (req, res) => {
         if (typeof program === "string") u.program = program.trim();
 
         const saved = await u.save();
+
         return res.json({
             name: saved.fullName || "",
             email: saved.email || "",
@@ -110,28 +125,26 @@ app.post("/api/profile-save", protect, async (req, res) => {
             role: saved.role,
         });
     } catch {
-        return res.status(400).json({ success: false, message: "Failed to update profile" });
+        return res.status(400).json({
+            success: false,
+            message: "Failed to update profile",
+        });
     }
 });
 
 /* ================= ROUTES ================= */
 
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api", require("./routes/profileRoutes"));
-app.use("/api", require("./routes/protectedRoutes"));
-app.use("/api", require("./routes/appointmentRoutes"));
-app.use("/api", require("./routes/sessionRoutes"));
-app.use("/api", require("./routes/notificationRoutes"));
-app.use("/api", require("./routes/feedbackRoutes"));
-app.use("/api", require("./routes/counsellorRoutes"));
+app.use("/api/auth", authRoutes);
+app.use("/api", profileRoutes);
+app.use("/api", protectedRoutes);
+app.use("/api", appointmentRoutes);
+app.use("/api", sessionRoutes);
+app.use("/api", notificationRoutes);
+app.use("/api", feedbackRoutes);
+app.use("/api", counsellorRoutes);
 
-const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
-
-// ✅ NEW: Admin routes for counsellor approval
-app.use("/api/admin", require("./routes/adminRoutes"));
-
-// Chat
+app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
 
 // Test Route

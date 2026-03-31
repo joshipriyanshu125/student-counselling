@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import { protect } from "../middleware/authMiddleware.js";
 
-const { protect } = require("../middleware/authMiddleware");
+const router = express.Router();
 
 router.get("/profile", protect, (req, res) => {
   const u = req.user;
@@ -139,5 +139,4 @@ router.post("/profile/update", protect, async (req, res) => {
   }
 });
 
-module.exports = router;
-
+export default router;
