@@ -54,10 +54,13 @@ export default function CallPage() {
                     return;
                 }
 
-                if (now < meetingStart) {
-                    setError("Meeting has not started yet");
-                    setLoading(false);
-                    return;
+                // If not started by counsellor, check time window
+                if (!aptData.isStarted) {
+                    if (now < meetingStart) {
+                        setError("Meeting has not started yet");
+                        setLoading(false);
+                        return;
+                    }
                 }
 
                 if (now > meetingEnd) {

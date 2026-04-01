@@ -12,7 +12,7 @@ router.put("/approve/:id", async (req, res) => {
         const user = await User.findByIdAndUpdate(
             req.params.id,
             { isApproved: true },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         if (!user) {

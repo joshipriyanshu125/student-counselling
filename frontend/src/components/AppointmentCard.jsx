@@ -10,13 +10,6 @@ const AppointmentCard = ({ appointment, updateStatus }) => {
     const [starting, setStarting] = useState(false);
 
     const handleStartMeeting = async () => {
-
-        // ✅ BLOCK INVALID TIME
-        if (!canJoinMeeting(appointment.date, appointment.time)) {
-            toast.error("Meeting is not available (expired or not started)")
-            return
-        }
-
         try {
             setStarting(true);
             await API.post(`/appointments/${appointment._id}/start-meeting`);
@@ -69,7 +62,7 @@ const AppointmentCard = ({ appointment, updateStatus }) => {
 
             </div>
 
-            <div className="flex gap-6 mt-5 pt-4 border-t border-slate-50 text-slate-500 text-[13px] font-semibold pl-16">
+            <div className="flex flex-wrap gap-6 mt-5 pt-4 border-t border-slate-50 text-slate-500 text-[13px] font-semibold pl-16">
 
                 <div className="flex items-center gap-2">
                     <Calendar size={14} className="text-slate-400" />
@@ -80,6 +73,19 @@ const AppointmentCard = ({ appointment, updateStatus }) => {
                     <Clock size={14} className="text-slate-400" />
                     {appointment.time}
                 </div>
+
+                {appointment.type && (
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide ${
+                        appointment.type === "video"
+                            ? "bg-blue-50 text-blue-600 border border-blue-100"
+                            : appointment.type === "audio"
+                            ? "bg-purple-50 text-purple-600 border border-purple-100"
+                            : "bg-orange-50 text-orange-600 border border-orange-100"
+                    }`}>
+                        {appointment.type === "video" ? <Video size={12} /> : appointment.type === "audio" ? <Phone size={12} /> : null}
+                        {appointment.type === "video" ? "Video Call" : appointment.type === "audio" ? "Audio Call" : "In-Person"}
+                    </div>
+                )}
 
             </div>
 
@@ -104,11 +110,10 @@ const AppointmentCard = ({ appointment, updateStatus }) => {
                     </>
                 )}
 
-                {/* 🔥 Start Meeting Button */}
+                {/* 🔥 Start Meeting Button — counsellor can always start an approved meeting */}
                 {appointment.status === "approved" &&
                     appointment.type !== "in-person" &&
-                    appointment.roomId &&
-                    canJoinMeeting(appointment.date, appointment.time) && ( // ✅ UPDATED
+                    appointment.roomId && (
                         <button
                             onClick={handleStartMeeting}
                             disabled={starting}

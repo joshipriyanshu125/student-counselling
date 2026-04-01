@@ -46,6 +46,11 @@ const appointmentSchema = new mongoose.Schema(
             enum: ["pending", "approved", "rejected", "completed"],
             default: "pending",
         },
+        
+        isStarted: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

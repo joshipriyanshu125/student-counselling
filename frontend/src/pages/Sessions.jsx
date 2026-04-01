@@ -23,7 +23,10 @@ function Sessions() {
                 const endpoint = isCounsellor ? "/sessions/my" : "/sessions/student";
                 const res = await API.get(endpoint);
                 if (isMounted) {
-                    setSessions(res.data.data);
+                    const sessionData = Array.isArray(res.data?.data) 
+                        ? res.data.data 
+                        : Array.isArray(res.data) ? res.data : [];
+                    setSessions(sessionData);
                 }
             } catch (error) {
                 if (isMounted) {

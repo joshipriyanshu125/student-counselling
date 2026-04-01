@@ -4,8 +4,13 @@ import Notification from "../models/Notification.js";
 export const getNotifications = async (req, res) => {
     try {
         const userId = req.user.id;
-        const notifications = await Notification.find({ user: userId }).sort({ createdAt: -1 });
-        res.json(notifications);
+        const notifications = await Notification.find({ user: userId })
+            .populate("appointmentId")
+            .sort({ createdAt: -1 });
+        res.json({
+            success: true,
+            data: notifications
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -17,7 +22,7 @@ export const markNotificationRead = async (req, res) => {
         const notification = await Notification.findByIdAndUpdate(
             req.params.id,
             { read: true },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         res.json({ message: "Notification marked as read", notification });

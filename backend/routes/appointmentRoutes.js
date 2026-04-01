@@ -40,7 +40,7 @@ router.get("/appointments/room/:roomId", protect, async (req, res) => {
             return res.status(400).json({ message: "Meeting already completed" });
         }
 
-        if (now < meetingStart) {
+        if (!appointment.isStarted && now < meetingStart) {
             return res.status(400).json({ message: "Meeting has not started yet" });
         }
 

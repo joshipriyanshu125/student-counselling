@@ -34,7 +34,9 @@ function NotificationDropdown() {
             // Ensure notifications is always an array
             const data = Array.isArray(res.data?.data)
                 ? res.data.data
-                : []
+                : Array.isArray(res.data) 
+                    ? res.data 
+                    : []
 
             setNotifications(data)
 
@@ -50,9 +52,9 @@ function NotificationDropdown() {
         fetchNotifications()
     }, [])
 
-    // Poll every 15 seconds for new notifications
+    // Poll every 3 seconds for faster meeting alerts when counsellor starts the session
     useEffect(() => {
-        const interval = setInterval(fetchNotifications, 15000)
+        const interval = setInterval(fetchNotifications, 3000)
         return () => clearInterval(interval)
     }, [])
 

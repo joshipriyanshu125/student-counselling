@@ -28,9 +28,9 @@ function Notifications() {
         fetchNotifications()
     }, [])
 
-    // Poll every 15 seconds
+    // Poll every 3 seconds for faster meeting alerts
     useEffect(() => {
-        const interval = setInterval(fetchNotifications, 15000)
+        const interval = setInterval(fetchNotifications, 3000)
         return () => clearInterval(interval)
     }, [])
 
@@ -128,16 +128,16 @@ function Notifications() {
                                         ) : apt.status === "approved" ? (
                                             <button
                                                 onClick={() => {
-                                                    if (!canJoinMeeting(apt.date, apt.time)) {
+                                                    // Allow joining if it's a 'meeting_started' type OR within the time window
+                                                    if (n.type !== "meeting_started" && !canJoinMeeting(apt.date, apt.time)) {
                                                         toast.error("Meeting not available yet")
                                                         return
                                                     }
                                                     markAsRead(n._id)
                                                     navigate(`/call/${apt.type}/${apt.roomId}`)
                                                 }}
-                                                disabled={!canJoinMeeting(apt.date, apt.time)}
                                                 className={`mt-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-xl transition-all shadow-md ${
-                                                    canJoinMeeting(apt.date, apt.time)
+                                                    n.type === "meeting_started" || canJoinMeeting(apt.date, apt.time)
                                                         ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"
                                                         : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                                                 }`}

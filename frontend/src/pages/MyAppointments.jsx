@@ -140,7 +140,7 @@ const MyAppointments = () => {
                                             {apt.counsellor?.fullName || "Professional Counsellor"}
                                         </h4>
                                         <div className="flex items-center gap-4 mt-1.5 font-bold text-slate-500 text-sm">
-                                            <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[11px]">{apt.mode}</span>
+                                            <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[11px]">{apt.type === "video" ? "Video Call" : apt.type === "audio" ? "Audio Call" : "In-Person"}</span>
                                             <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
                                             <span className="flex items-center gap-1.5"><Calendar size={15} /> {new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
                                             <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
@@ -156,18 +156,18 @@ const MyAppointments = () => {
                                 <div className="mt-6 ml-[84px]">
                                     <button
                                         onClick={() => {
-                                            if (!canJoinMeeting(apt.date, apt.time)) {
+                                            if (!apt.isStarted && !canJoinMeeting(apt.date, apt.time)) {
                                                 toast.error("Meeting not available yet")
                                                 return
                                             }
                                             navigate(`/call/${apt.type}/${apt.roomId}`, { replace: true })
                                         }}
                                         className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-wide transition-all shadow-md ${
-                                            canJoinMeeting(apt.date, apt.time)
+                                            apt.isStarted || canJoinMeeting(apt.date, apt.time)
                                                 ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"
                                                 : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                                         }`}
-                                        disabled={!canJoinMeeting(apt.date, apt.time)}
+                                        disabled={!apt.isStarted && !canJoinMeeting(apt.date, apt.time)}
                                     >
                                         <Video size={18} />
                                         Join {apt.type} session

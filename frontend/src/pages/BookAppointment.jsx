@@ -10,8 +10,8 @@ const BookAppointment = () => {
     const [selectedCounsellor, setSelectedCounsellor] = useState(null);
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
-    const [mode, setMode] = useState("");
-    const [message, setMessage] = useState("");
+    const [type, setType] = useState("");
+    const [reason, setReason] = useState("");
 
     // Fetch counsellors from backend
     useEffect(() => {
@@ -47,7 +47,7 @@ const BookAppointment = () => {
 
     const handleSubmit = async () => {
 
-        if (!selectedCounsellor || !date || !time || !mode) {
+        if (!selectedCounsellor || !date || !time || !type) {
             toast.error("Please fill all required fields");
             return;
         }
@@ -60,8 +60,8 @@ const BookAppointment = () => {
                 counsellorId: selectedCounsellor._id,
                 date,
                 time,
-                mode,
-                message
+                type,
+                reason
             };
 
             await API.post(
@@ -79,8 +79,8 @@ const BookAppointment = () => {
             setSelectedCounsellor(null);
             setDate("");
             setTime("");
-            setMode("");
-            setMessage("");
+            setType("");
+            setReason("");
 
         } catch (error) {
 
@@ -187,20 +187,20 @@ const BookAppointment = () => {
 
                 <select
                     className="border border-slate-200 rounded-xl p-3 mb-6 w-full"
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value)}
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
                 >
                     <option value="">Select Mode</option>
                     <option value="video">Video Call</option>
                     <option value="audio">Audio Call</option>
-                    <option value="in_person">In Person</option>
+                    <option value="in-person">In Person</option>
                 </select>
 
                 <textarea
                     className="border border-slate-200 rounded-xl p-3 w-full mb-8"
-                    placeholder="Additional Notes"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Reason for appointment"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
                 />
 
                 <button

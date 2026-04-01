@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Appointment from "../models/Appointment.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 // BOOK APPOINTMENT
 export const bookAppointment = async (req, res) => {
@@ -75,7 +76,7 @@ export const updateAppointmentStatus = async (req, res) => {
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
             { status },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         res.json({
@@ -110,13 +111,28 @@ export const startMeeting = async (req, res) => {
     try {
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
-            { status: "approved" },
-            { new: true }
+            { 
+                status: "approved",
+                isStarted: true 
+            },
+            { returnDocument: "after" }
         );
+
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        // Send Notification to student
+        await Notification.create({
+            user: appointment.student,
+            message: `Your counsellor has started the ${appointment.type} meeting session.`,
+            type: "meeting_started",
+            appointmentId: appointment._id
+        });
 
         res.json({
             success: true,
-            message: "Meeting started",
+            message: "Meeting started and student notified",
             data: appointment
         });
 
@@ -152,7 +168,7 @@ export const endMeeting = async (req, res) => {
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
             { status: "completed" },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         res.json({

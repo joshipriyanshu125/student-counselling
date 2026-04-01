@@ -61,16 +61,16 @@ function NotificationList({ notifications, markAsRead }) {
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation()
-                                        if (!canJoinMeeting(apt.date, apt.time)) {
+                                        // Allow joining if it's a 'meeting_started' type OR within the time window
+                                        if (n.type !== "meeting_started" && !canJoinMeeting(apt.date, apt.time)) {
                                             toast.error("Meeting not available yet")
                                             return
                                         }
                                         markAsRead(n._id)
                                         navigate(`/call/${apt.type}/${apt.roomId}`)
                                     }}
-                                    disabled={!canJoinMeeting(apt.date, apt.time)}
                                     className={`mt-2 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all ${
-                                        canJoinMeeting(apt.date, apt.time)
+                                        n.type === "meeting_started" || canJoinMeeting(apt.date, apt.time)
                                             ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
                                             : "bg-slate-100 text-slate-300 cursor-not-allowed"
                                     }`}

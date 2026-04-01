@@ -365,18 +365,18 @@ const Dashboard = () => {
                                         {apt.status === "approved" && apt.type !== "in-person" && apt.roomId && (
                                             <button
                                                 onClick={() => {
-                                                    if (!canJoinMeeting(apt.date, apt.time)) {
+                                                    if (!apt.isStarted && !canJoinMeeting(apt.date, apt.time)) {
                                                         toast.error("Meeting not available yet")
                                                         return
                                                     }
                                                     navigate(`/call/${apt.type}/${apt.roomId}`)
                                                 }}
                                                 className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
-                                                    canJoinMeeting(apt.date, apt.time)
+                                                    apt.isStarted || canJoinMeeting(apt.date, apt.time)
                                                         ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100"
                                                         : "bg-slate-100 text-slate-300 cursor-not-allowed"
                                                 }`}
-                                                disabled={!canJoinMeeting(apt.date, apt.time)}
+                                                disabled={!apt.isStarted && !canJoinMeeting(apt.date, apt.time)}
                                             >
                                                 <Video size={18} />
                                                 JOIN {apt.type} SESSION

@@ -18,7 +18,10 @@ export const getStudentSessions = async (req, res) => {
     try {
         const userId = req.user.id;
         const sessions = await Session.find({ student: userId }).populate("counsellor appointment");
-        res.json(sessions);
+        res.json({
+            success: true,
+            data: sessions
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -29,7 +32,10 @@ export const getCounsellorSessions = async (req, res) => {
     try {
         const userId = req.user.id;
         const sessions = await Session.find({ counsellor: userId }).populate("student appointment");
-        res.json(sessions);
+        res.json({
+            success: true,
+            data: sessions
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -42,7 +48,10 @@ export const getSessionById = async (req, res) => {
         if (!session) {
             return res.status(404).json({ message: "Session not found" });
         }
-        res.json(session);
+        res.json({
+            success: true,
+            data: session
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
