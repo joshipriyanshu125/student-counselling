@@ -12,12 +12,14 @@ function Feedback() {
 
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const sessionId = useMemo(() => location.state?.sessionId, [location.state])
 
     const handleSubmit = async (e) => {
 
         e.preventDefault()
+        if (isSubmitting) return
 
         if (!sessionId) {
             toast.error("Missing session. Please open Feedback from a session.")
@@ -30,6 +32,7 @@ function Feedback() {
         }
 
         try {
+            setIsSubmitting(true)
 
             await API.post("/feedback", {
                 sessionId,
@@ -49,13 +52,16 @@ function Feedback() {
             const data = error.response?.data
             const backendMessage =
                 typeof data === "string" ? data : data?.message || data?.error
-            const message =
-                backendMessage ||
-                error.message ||
-                "Failed to submit feedback"
+            const message = backendMessage || error.message || "Failed to submit feedback"
 
-            toast.error(status ? `${status}: ${message}` : message)
+            if (status === 409) {
+                toast.error(message || "You already submitted feedback for this session.")
+            } else {
+                toast.error(status ? `${status}: ${message}` : message)
+            }
 
+        } finally {
+            setIsSubmitting(false)
         }
 
     }
@@ -124,6 +130,7 @@ function Feedback() {
 
                         <Button
                             text="Submit Feedback"
+                            loading={isSubmitting}
                             className="py-3.5 text-lg shadow-xl shadow-indigo-500/20 mt-4"
                         />
 

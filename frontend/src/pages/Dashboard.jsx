@@ -63,9 +63,9 @@ const Dashboard = () => {
 
         const total = appointments.length;
 
-        // ✅ FIXED (supports both)
+        // ✅ FIXED (strictly completed)
         const completed = appointments.filter(
-            a => a.status === "completed" || a.status === "approved"
+            a => a.status === "completed"
         ).length;
 
         const counsellors = new Set(
@@ -81,7 +81,7 @@ const Dashboard = () => {
         // ✅ FIXED
         const thisWeekCompleted = appointments.filter(
             a =>
-                (a.status === "completed" || a.status === "approved") &&
+                a.status === "completed" &&
                 new Date(a.updatedAt) >= startOfWeek
         ).length;
 
@@ -112,8 +112,8 @@ const Dashboard = () => {
             const m = months.find(item => item.monthKey === key);
             if (m) {
                 m.Appointments++;
-                // ✅ FIXED
-                if (apt.status === 'completed' || apt.status === 'approved') m.Sessions++;
+                // ✅ FIXED (strictly completed)
+                if (apt.status === 'completed') m.Sessions++;
             }
         });
         return months;
@@ -138,8 +138,8 @@ const Dashboard = () => {
             const d = days.find(item => item.dateKey === date);
             if (d) {
                 d.Appointments++;
-                // ✅ FIXED
-                if (apt.status === 'completed' || apt.status === 'approved') d.Sessions++;
+                // ✅ FIXED (strictly completed)
+                if (apt.status === 'completed') d.Sessions++;
             }
         });
         return days;
@@ -374,13 +374,19 @@ const Dashboard = () => {
                                                 className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
                                                     apt.isStarted || canJoinMeeting(apt.date, apt.time)
                                                         ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100"
-                                                        : "bg-slate-100 text-slate-300 cursor-not-allowed"
+                                                        : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                                                 }`}
                                                 disabled={!apt.isStarted && !canJoinMeeting(apt.date, apt.time)}
                                             >
                                                 <Video size={18} />
                                                 JOIN {apt.type} SESSION
                                             </button>
+                                        )}
+                                        
+                                        {apt.status === "completed" && (
+                                            <div className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] bg-slate-50 text-slate-400 border border-dashed border-slate-200">
+                                                Session Completed
+                                            </div>
                                         )}
                                     </div>
                                 ))

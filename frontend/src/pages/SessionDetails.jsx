@@ -9,7 +9,7 @@ const SessionDetails = () => {
     const navigate = useNavigate();
 
     const [session, setSession] = useState(null);
-    const [feedback, setFeedback] = useState([]);
+    const [feedback, setFeedback] = useState(null);
     const [loading, setLoading] = useState(true);
     const [feedbackLoading, setFeedbackLoading] = useState(false);
 
@@ -60,12 +60,12 @@ const SessionDetails = () => {
                 if (!active) return;
 
                 if (res.data?.success) {
-                    setFeedback(Array.isArray(res.data.data) ? res.data.data : []);
+                    setFeedback(res.data.data || null);
                 } else {
-                    setFeedback([]);
+                    setFeedback(null);
                 }
             } catch {
-                setFeedback([]);
+                setFeedback(null);
             } finally {
                 if (active) setFeedbackLoading(false);
             }
@@ -203,35 +203,31 @@ const SessionDetails = () => {
 
                     {feedbackLoading ? (
                         <div className="text-slate-500 font-medium">Loading feedback...</div>
-                    ) : feedback.length === 0 ? (
+                    ) : !feedback ? (
                         <div className="text-slate-500 font-medium">
                             No feedback submitted yet.
                         </div>
                     ) : (
-                        <div className="space-y-3">
-                            {feedback.map((f) => (
-                                <div
-                                    key={f._id}
-                                    className="bg-slate-50 border border-slate-200 rounded-xl p-4"
-                                >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="text-slate-800 font-bold">
-                                            {f.student?.fullName || f.student?.email || "Student"}
-                                        </div>
-                                        <div className="flex items-center gap-1 text-amber-500 font-extrabold">
-                                            <Star className="w-4 h-4" />
-                                            <span>{f.rating}</span>
-                                        </div>
-                                    </div>
-                                    {f.comment ? (
-                                        <div className="mt-2 text-slate-700 whitespace-pre-wrap">
-                                            {f.comment}
-                                        </div>
-                                    ) : (
-                                        <div className="mt-2 text-slate-500">No comment.</div>
-                                    )}
+                        <div
+                            key={feedback._id}
+                            className="bg-slate-50 border border-slate-200 rounded-xl p-4"
+                        >
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="text-slate-800 font-bold">
+                                    {feedback.student?.fullName || feedback.student?.email || "Student"}
                                 </div>
-                            ))}
+                                <div className="flex items-center gap-1 text-amber-500 font-extrabold">
+                                    <Star className="w-4 h-4" />
+                                    <span>{feedback.rating}</span>
+                                </div>
+                            </div>
+                            {feedback.comment ? (
+                                <div className="mt-2 text-slate-700 whitespace-pre-wrap">
+                                    {feedback.comment}
+                                </div>
+                            ) : (
+                                <div className="mt-2 text-slate-500">No comment.</div>
+                            )}
                         </div>
                     )}
                 </div>

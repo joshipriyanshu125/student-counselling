@@ -174,6 +174,15 @@ const MyAppointments = () => {
                                     </button>
                                 </div>
                             )}
+
+                            {apt.status === "completed" && (
+                                <div className="mt-6 ml-[84px]">
+                                    <div className="flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-[0.1em] bg-slate-50 text-slate-400 border border-dashed border-slate-200 w-fit">
+                                        <CheckCircle size={18} className="text-emerald-500" />
+                                        Session Completed
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ));
                 })()}

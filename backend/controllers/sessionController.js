@@ -1,12 +1,45 @@
 import Session from "../models/Session.js";
+import Appointment from "../models/Appointment.js";
 
 // CREATE SESSION (Counsellor)
 export const createSession = async (req, res) => {
     try {
-        const session = new Session(req.body);
+        const { appointmentId, notes, recommendations, followUpDate } = req.body;
+
+        if (!appointmentId) {
+            console.error("No appointmentId provided in request body:", req.body);
+            return res.status(400).json({ message: "Appointment ID is required" });
+        }
+
+        console.log("🛠️ Attempting to create session for appointmentId:", appointmentId);
+        console.log("📝 Session notes:", notes);
+
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            console.error("No appointment found for ID:", appointmentId);
+            return res.status(404).json({ message: "Associated meeting not found" });
+        }
+
+        console.log("Found appointment. student:", appointment.student, "counsellor:", appointment.counsellor);
+
+        const session = new Session({
+            appointment: appointmentId,
+            student: appointment.student,
+            counsellor: appointment.counsellor,
+            notes,
+            recommendations,
+            followUpDate
+        });
+
+        console.log("Attempting to save session object:", session);
+
         await session.save();
 
-        res.status(201).json({ message: "Session created", session });
+        res.status(201).json({ 
+            success: true,
+            message: "Session recorded successfully", 
+            session 
+        });
 
     } catch (error) {
         res.status(500).json({ message: error.message });
