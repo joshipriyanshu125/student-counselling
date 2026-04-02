@@ -39,7 +39,7 @@ export default function CallPage() {
 
         const checkStatusAndInit = async () => {
             try {
-                const res = await API.get(`/appointments/room/${roomId}`);
+                const res = await API.post(`/appointments/room/${roomId}/join`);
                 const aptData = res.data.data;
                 setAppointment(aptData);
 

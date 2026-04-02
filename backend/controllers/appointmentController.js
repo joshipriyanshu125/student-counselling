@@ -22,6 +22,13 @@ export const bookAppointment = async (req, res) => {
 
         await appointment.save();
 
+        await Notification.create({
+            user: counsellorId,
+            message: "You have a new appointment request.",
+            type: "general",
+            appointmentId: appointment._id
+        });
+
         res.status(201).json({
             success: true,
             message: "Appointment booked successfully",
@@ -73,11 +80,34 @@ export const getCounsellorAppointments = async (req, res) => {
 export const updateAppointmentStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const allowedStatuses = ["pending", "approved", "rejected", "completed"];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid appointment status" });
+        }
+
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
             { status },
             { returnDocument: "after" }
         );
+
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        const statusMessageMap = {
+            approved: "Your appointment has been approved.",
+            rejected: "Your appointment has been rejected.",
+            completed: "Your appointment session has been marked completed.",
+            pending: "Your appointment status has been updated."
+        };
+
+        await Notification.create({
+            user: appointment.student,
+            message: statusMessageMap[status] || "Your appointment status has been updated.",
+            type: "general",
+            appointmentId: appointment._id
+        });
 
         res.json({
             success: true,
@@ -109,18 +139,22 @@ export const getCounsellors = async (req, res) => {
 // START MEETING
 export const startMeeting = async (req, res) => {
     try {
-        const appointment = await Appointment.findByIdAndUpdate(
-            req.params.id,
-            { 
-                status: "approved",
-                isStarted: true 
-            },
-            { returnDocument: "after" }
-        );
+        const appointment = await Appointment.findById(req.params.id);
 
         if (!appointment) {
             return res.status(404).json({ message: "Appointment not found" });
         }
+
+        if (appointment.status === "completed") {
+            return res.status(400).json({ message: "Cannot start a completed meeting" });
+        }
+
+        if (appointment.status !== "approved") {
+            return res.status(400).json({ message: "Only approved appointments can be started" });
+        }
+
+        appointment.isStarted = true;
+        await appointment.save();
 
         // Send Notification to student
         await Notification.create({
@@ -159,6 +193,63 @@ export const getAppointmentByRoomId = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// JOIN MEETING BY ROOM ID (single join per user)
+export const joinMeetingByRoomId = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const appointment = await Appointment.findOne({ roomId: req.params.roomId })
+            .populate("student", "fullName")
+            .populate("counsellor", "fullName");
+
+        if (!appointment) {
+            return res.status(404).json({ message: "Meeting not found" });
+        }
+
+        const userIdStr = String(userId);
+        const isParticipant =
+            String(appointment.student?._id || appointment.student) === userIdStr ||
+            String(appointment.counsellor?._id || appointment.counsellor) === userIdStr;
+
+        if (!isParticipant) {
+            return res.status(403).json({ message: "You are not allowed to join this meeting" });
+        }
+
+        if (appointment.status === "completed") {
+            return res.status(400).json({ message: "Meeting already completed" });
+        }
+
+        const meetingStart = new Date(`${appointment.date} ${appointment.time}`);
+        const now = new Date();
+        const meetingEnd = new Date(meetingStart.getTime() + 60 * 60 * 1000);
+
+        if (!appointment.isStarted && now < meetingStart) {
+            return res.status(400).json({ message: "Meeting has not started yet" });
+        }
+
+        if (now > meetingEnd) {
+            return res.status(400).json({ message: "Meeting has already ended" });
+        }
+
+        const alreadyJoined = (appointment.joinedUsers || []).some(
+            (id) => String(id) === userIdStr
+        );
+
+        if (alreadyJoined) {
+            return res.status(409).json({ message: "You have already joined this meeting once" });
+        }
+
+        appointment.joinedUsers = [...(appointment.joinedUsers || []), userId];
+        await appointment.save();
+
+        return res.json({
+            success: true,
+            data: appointment,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 };
 

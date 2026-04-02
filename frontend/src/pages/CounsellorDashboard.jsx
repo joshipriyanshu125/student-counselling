@@ -15,7 +15,7 @@ const CounsellorDashboard = () => {
     const [stats, setStats] = useState({
         total: 0,
         pending: 0,
-        approved: 0,
+        completed: 0,
         rejected: 0
     })
 
@@ -42,7 +42,7 @@ const CounsellorDashboard = () => {
                     setStats({
                         total: apts.length,
                         pending: apts.filter(a => a.status === "pending").length,
-                        approved: apts.filter(a => a.status === "approved").length,
+                        completed: apts.filter(a => a.status === "completed").length,
                         rejected: apts.filter(a => a.status === "rejected").length,
                     })
 
@@ -65,7 +65,7 @@ const CounsellorDashboard = () => {
                         const m = months.find(item => item.monthKey === key);
                         if (m) {
                             m.Scheduled++;
-                            if (apt.status === 'approved') m.Completed++;
+                            if (apt.status === 'completed') m.Completed++;
                         }
                     });
                     setTrendsData(months);
@@ -96,7 +96,7 @@ const CounsellorDashboard = () => {
                         const d = days.find(item => item.dateKey === date);
                         if (d) {
                             d.Scheduled++;
-                            if (apt.status === 'approved') d.Completed++;
+                            if (apt.status === 'completed') d.Completed++;
                         }
                     });
                     setWeeklyData(days);
@@ -166,9 +166,9 @@ const CounsellorDashboard = () => {
                         </div>
 
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
-                            <h3 className="text-slate-500 font-medium mb-1 text-sm">Approved</h3>
-                            <p className="text-4xl font-bold text-slate-800 mb-4">{stats.approved}</p>
-                            <p className="text-slate-400 text-xs">Confirmed sessions</p>
+                            <h3 className="text-slate-500 font-medium mb-1 text-sm">Completed Sessions</h3>
+                            <p className="text-4xl font-bold text-slate-800 mb-4">{stats.completed}</p>
+                            <p className="text-slate-400 text-xs">Sessions completed</p>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center">
                                 <CheckCircle className="w-7 h-7 text-emerald-500" />
                             </div>

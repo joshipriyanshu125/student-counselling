@@ -128,8 +128,8 @@ function Notifications() {
                                         ) : apt.status === "approved" ? (
                                             <button
                                                 onClick={() => {
-                                                    // Allow joining if it's a 'meeting_started' type OR within the time window
-                                                    if (n.type !== "meeting_started" && !canJoinMeeting(apt.date, apt.time)) {
+                                                    const canJoinNow = apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
+                                                    if (!canJoinNow) {
                                                         toast.error("Meeting not available yet")
                                                         return
                                                     }
@@ -137,7 +137,7 @@ function Notifications() {
                                                     navigate(`/call/${apt.type}/${apt.roomId}`)
                                                 }}
                                                 className={`mt-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-xl transition-all shadow-md ${
-                                                    n.type === "meeting_started" || canJoinMeeting(apt.date, apt.time)
+                                                    apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
                                                         ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"
                                                         : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                                                 }`}

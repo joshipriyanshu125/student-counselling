@@ -9,6 +9,7 @@ import {
     getCounsellors,
     startMeeting,
     getAppointmentByRoomId,
+    joinMeetingByRoomId,
     endMeeting,
 } from "../controllers/appointmentController.js";
 
@@ -58,6 +59,8 @@ router.get("/appointments/room/:roomId", protect, async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+router.post("/appointments/room/:roomId/join", protect, joinMeetingByRoomId);
 
 router.get("/counsellors", protect, getCounsellors);
 

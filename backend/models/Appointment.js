@@ -51,6 +51,13 @@ const appointmentSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+
+        joinedUsers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     {
         timestamps: true,

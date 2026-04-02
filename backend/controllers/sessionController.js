@@ -20,6 +20,15 @@ export const createSession = async (req, res) => {
             return res.status(404).json({ message: "Associated meeting not found" });
         }
 
+        if (appointment.status === "completed") {
+            return res.status(409).json({ message: "Session is already completed for this appointment" });
+        }
+
+        const existingSession = await Session.findOne({ appointment: appointmentId });
+        if (existingSession) {
+            return res.status(409).json({ message: "Session already exists for this appointment" });
+        }
+
         console.log("Found appointment. student:", appointment.student, "counsellor:", appointment.counsellor);
 
         const session = new Session({
@@ -34,6 +43,10 @@ export const createSession = async (req, res) => {
         console.log("Attempting to save session object:", session);
 
         await session.save();
+
+        appointment.status = "completed";
+        appointment.isStarted = false;
+        await appointment.save();
 
         res.status(201).json({ 
             success: true,

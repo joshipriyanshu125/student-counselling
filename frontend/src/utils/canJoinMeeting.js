@@ -24,14 +24,15 @@ export const canJoinMeeting = (dateStr, timeStr) => {
         // Current time
         const now = new Date()
 
-        // allow joining 15 mins before
-        const gracePeriodBefore = 15 * 60 * 1000 
-        const startTimeWithGrace = new Date(meetingStart.getTime() - gracePeriodBefore)
+        // allow joining 15 mins before the scheduled time
+        const gracePeriodBefore = 15 * 60 * 1000;
+        const startTimeWithGrace = new Date(meetingStart.getTime() - gracePeriodBefore);
 
-        // Allow until end of day
-        const endOfDay = new Date(year, month, day, 23, 59, 59)
+        // allow joining only during a limited session window (default 75 mins total)
+        const meetingDuration = 75 * 60 * 1000;
+        const meetingWindowEnd = new Date(meetingStart.getTime() + meetingDuration);
 
-        return now >= startTimeWithGrace && now <= endOfDay
+        return now >= startTimeWithGrace && now <= meetingWindowEnd;
 
     } catch (error) {
         console.error("Error in canJoinMeeting:", error)

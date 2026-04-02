@@ -18,6 +18,7 @@ const Dashboard = () => {
     const [userName, setUserName] = useState("");
     const [appointments, setAppointments] = useState([]);
     const [feedbacks, setFeedbacks] = useState([]);
+    const [sessions, setSessions] = useState([]);
     const [trendView, setTrendView] = useState("monthly");
 
     useEffect(() => {
@@ -31,9 +32,10 @@ const Dashboard = () => {
                     setUserName(name);
                 }
 
-                const [aptRes, feedbackRes] = await Promise.all([
+                const [aptRes, feedbackRes, sessionsRes] = await Promise.all([
                     API.get("/appointments/my"),
-                    API.get("/feedback/student")
+                    API.get("/feedback/student"),
+                    API.get("/sessions/student")
                 ]);
 
                 if (aptRes.data?.success) {
@@ -42,6 +44,10 @@ const Dashboard = () => {
 
                 if (feedbackRes.data?.success) {
                     setFeedbacks(feedbackRes.data.data);
+                }
+
+                if (sessionsRes.data?.success) {
+                    setSessions(sessionsRes.data.data);
                 }
 
             } catch (err) {
@@ -62,11 +68,7 @@ const Dashboard = () => {
         startOfWeek.setDate(now.getDate() - now.getDay());
 
         const total = appointments.length;
-
-        // ✅ FIXED (strictly completed)
-        const completed = appointments.filter(
-            a => a.status === "completed"
-        ).length;
+        const completed = sessions.length;
 
         const counsellors = new Set(
             appointments.filter(a => a.counsellor).map(a => a.counsellor._id || a.counsellor)
@@ -78,15 +80,12 @@ const Dashboard = () => {
 
         const thisMonthCount = appointments.filter(a => new Date(a.date) >= startOfMonth).length;
 
-        // ✅ FIXED
-        const thisWeekCompleted = appointments.filter(
-            a =>
-                a.status === "completed" &&
-                new Date(a.updatedAt) >= startOfWeek
+        const thisWeekCompleted = sessions.filter(
+            s => new Date(s.createdAt) >= startOfWeek
         ).length;
 
         return { total, completed, counsellors, avgRating, thisMonthCount, thisWeekCompleted };
-    }, [appointments, feedbacks]);
+    }, [appointments, feedbacks, sessions]);
 
     const notifications = [
         { id: 1, title: "Welcome to CounselHub! Your dashboard is now live.", time: "Just now" },
@@ -112,12 +111,19 @@ const Dashboard = () => {
             const m = months.find(item => item.monthKey === key);
             if (m) {
                 m.Appointments++;
-                // ✅ FIXED (strictly completed)
-                if (apt.status === 'completed') m.Sessions++;
+            }
+        });
+
+        sessions.forEach((session) => {
+            const date = new Date(session.createdAt);
+            const key = `${date.getFullYear()}-${date.getMonth()}`;
+            const m = months.find(item => item.monthKey === key);
+            if (m) {
+                m.Sessions++;
             }
         });
         return months;
-    }, [appointments]);
+    }, [appointments, sessions]);
 
     const weeklyTrends = useMemo(() => {
         const days = [];
@@ -138,12 +144,18 @@ const Dashboard = () => {
             const d = days.find(item => item.dateKey === date);
             if (d) {
                 d.Appointments++;
-                // ✅ FIXED (strictly completed)
-                if (apt.status === 'completed') d.Sessions++;
+            }
+        });
+
+        sessions.forEach((session) => {
+            const date = new Date(session.createdAt).toDateString();
+            const d = days.find(item => item.dateKey === date);
+            if (d) {
+                d.Sessions++;
             }
         });
         return days;
-    }, [appointments]);
+    }, [appointments, sessions]);
 
     const sessionTypes = useMemo(() => {
         const counts = appointments.reduce((acc, apt) => {
@@ -365,18 +377,19 @@ const Dashboard = () => {
                                         {apt.status === "approved" && apt.type !== "in-person" && apt.roomId && (
                                             <button
                                                 onClick={() => {
-                                                    if (!apt.isStarted && !canJoinMeeting(apt.date, apt.time)) {
+                                                    const canJoinNow = apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
+                                                    if (!canJoinNow) {
                                                         toast.error("Meeting not available yet")
                                                         return
                                                     }
                                                     navigate(`/call/${apt.type}/${apt.roomId}`)
                                                 }}
                                                 className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
-                                                    apt.isStarted || canJoinMeeting(apt.date, apt.time)
+                                                    apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
                                                         ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100"
                                                         : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                                                 }`}
-                                                disabled={!apt.isStarted && !canJoinMeeting(apt.date, apt.time)}
+                                                disabled={apt.status === "completed" || (!apt.isStarted && !canJoinMeeting(apt.date, apt.time))}
                                             >
                                                 <Video size={18} />
                                                 JOIN {apt.type} SESSION

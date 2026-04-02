@@ -156,18 +156,19 @@ const MyAppointments = () => {
                                 <div className="mt-6 ml-[84px]">
                                     <button
                                         onClick={() => {
-                                            if (!apt.isStarted && !canJoinMeeting(apt.date, apt.time)) {
+                                            const canJoinNow = apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
+                                            if (!canJoinNow) {
                                                 toast.error("Meeting not available yet")
                                                 return
                                             }
                                             navigate(`/call/${apt.type}/${apt.roomId}`, { replace: true })
                                         }}
                                         className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-wide transition-all shadow-md ${
-                                            apt.isStarted || canJoinMeeting(apt.date, apt.time)
+                                            apt.status !== "completed" && (apt.isStarted || canJoinMeeting(apt.date, apt.time))
                                                 ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"
                                                 : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                                         }`}
-                                        disabled={!apt.isStarted && !canJoinMeeting(apt.date, apt.time)}
+                                        disabled={apt.status === "completed" || (!apt.isStarted && !canJoinMeeting(apt.date, apt.time))}
                                     >
                                         <Video size={18} />
                                         Join {apt.type} session
