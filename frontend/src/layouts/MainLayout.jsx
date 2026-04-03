@@ -7,7 +7,8 @@ import {
     MessageSquare,
     Star,
     User,
-    GraduationCap
+    GraduationCap,
+    Users
 } from "lucide-react"
 
 import NotificationDropdown from "../components/NotificationDropdown"
@@ -25,6 +26,7 @@ function MainLayout({ children }) {
 
     const studentMenu = [
         { name: "Dashboard", path: "/dashboard", icon: LayoutGrid },
+        { name: "Counsellors", path: "/counsellors", icon: Users },
         { name: "Appointments", path: "/my-appointments", icon: Calendar },
         { name: "Book Appointment", path: "/book-appointment", icon: BookOpen },
         { name: "Sessions", path: "/sessions", icon: MessageSquare },

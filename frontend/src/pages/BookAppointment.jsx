@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Search } from "lucide-react";
 import API from "../api/api";
 import toast from "react-hot-toast";
@@ -12,6 +13,9 @@ const BookAppointment = () => {
     const [time, setTime] = useState("");
     const [type, setType] = useState("");
     const [reason, setReason] = useState("");
+
+    const location = useLocation();
+    const passedCounsellorId = location.state?.selectedCounsellorId;
 
     // Fetch counsellors from backend
     useEffect(() => {
@@ -30,6 +34,14 @@ const BookAppointment = () => {
 
                 if (res.data && res.data.data) {
                     setCounsellors(res.data.data);
+                    
+                    // If a counsellor ID was passed, select it
+                    if (passedCounsellorId) {
+                        const preselected = res.data.data.find(c => c._id === passedCounsellorId);
+                        if (preselected) {
+                            setSelectedCounsellor(preselected);
+                        }
+                    }
                 }
 
             } catch (error) {
@@ -43,7 +55,7 @@ const BookAppointment = () => {
 
         fetchCounsellors();
 
-    }, []);
+    }, [passedCounsellorId]);
 
     const handleSubmit = async () => {
 

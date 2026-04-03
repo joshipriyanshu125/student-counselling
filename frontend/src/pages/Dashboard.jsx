@@ -249,8 +249,12 @@ const Dashboard = () => {
                         </div>
 
                         {/* Counsellors Seen */}
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group hover:-translate-y-1">
-                            <div className="flex justify-between items-start mb-8">
+                        <div 
+                            onClick={() => navigate("/counsellors")}
+                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-500 group hover:-translate-y-1 cursor-pointer relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-violet-600/5 rounded-bl-[4rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="flex justify-between items-start mb-8 relative z-10">
                                 <div>
                                     <p className="text-slate-400 font-bold text-[13px] uppercase tracking-[0.1em] mb-2">Counsellors Seen</p>
                                     <h3 className="text-6xl font-black text-slate-900 leading-tight">{stats.counsellors}</h3>
@@ -259,6 +263,9 @@ const Dashboard = () => {
                                     <Users className="w-8 h-8" strokeWidth={2.5} />
                                 </div>
                             </div>
+                            <p className="text-violet-500 text-[13px] font-extrabold uppercase tracking-wider flex items-center gap-1 relative z-10">
+                                Discover more <ArrowRight size={14} />
+                            </p>
                         </div>
 
                         {/* Avg. Rating Given */}

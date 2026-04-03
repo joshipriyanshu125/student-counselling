@@ -233,16 +233,11 @@ export const joinMeetingByRoomId = async (req, res) => {
             return res.status(400).json({ message: "Meeting has already ended" });
         }
 
-        const alreadyJoined = (appointment.joinedUsers || []).some(
-            (id) => String(id) === userIdStr
-        );
-
-        if (alreadyJoined) {
-            return res.status(409).json({ message: "You have already joined this meeting once" });
+        // Add user to joinedUsers if not already present (for tracking, but don't block)
+        if (!(appointment.joinedUsers || []).some(id => String(id) === userIdStr)) {
+            appointment.joinedUsers = [...(appointment.joinedUsers || []), userId];
+            await appointment.save();
         }
-
-        appointment.joinedUsers = [...(appointment.joinedUsers || []), userId];
-        await appointment.save();
 
         return res.json({
             success: true,

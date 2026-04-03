@@ -61,6 +61,38 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 5,
         },
+
+        bio: {
+            type: String,
+            default: "",
+        },
+
+        location: {
+            type: String,
+            default: "",
+        },
+
+        yearsOfExperience: {
+            type: Number,
+            default: 0,
+        },
+
+        tags: {
+            type: [String],
+            default: [],
+        },
+
+        ratingCount: {
+            type: Number,
+            default: 0,
+        },
+
+        availability: [
+            {
+                day: String,
+                slots: [String],
+            }
+        ],
     },
     {
         timestamps: true,

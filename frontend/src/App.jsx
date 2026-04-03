@@ -16,6 +16,7 @@ import Feedback from "./pages/Feedback";
 import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
+import Counsellors from "./pages/Counsellors";
 
 /* ✅ CALL PAGE */
 import CallPage from "./pages/CallPage";
@@ -60,6 +61,17 @@ function App() {
         />
 
         {/* Main App Routes */}
+        <Route
+          path="/counsellors"
+          element={
+            <MainLayout>
+              <PageTransition>
+                <Counsellors />
+              </PageTransition>
+            </MainLayout>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={

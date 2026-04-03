@@ -9,7 +9,8 @@ import {
     Bell,
     User,
     GraduationCap,
-    CheckSquare
+    CheckSquare,
+    Users
 } from "lucide-react";
 
 function Sidebar() {
@@ -22,6 +23,7 @@ function Sidebar() {
     // student menu
     const studentLinks = [
         { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+        { name: "Counsellors", path: "/counsellors", icon: <Users className="w-5 h-5" /> },
         { name: "Appointments", path: "/my-appointments", icon: <Calendar className="w-5 h-5" /> },
         { name: "Book Appointment", path: "/book-appointment", icon: <CalendarPlus className="w-5 h-5" /> },
         { name: "Sessions", path: "/sessions", icon: <History className="w-5 h-5" /> },
