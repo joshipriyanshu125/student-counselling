@@ -1,14 +1,23 @@
 import React from "react";
 import { X, Calendar } from "lucide-react";
+import { getDefaultWeeklyAvailability } from "../constants/bookingTimes";
 
 const AvailabilityModal = ({ isOpen, onClose, counsellor }) => {
     if (!isOpen || !counsellor) return null;
 
-    const availability = counsellor.availability || [];
+    // Same slots as Book Appointment (dropdown), listed for each day (weekly grid ref.)
+    const availability = getDefaultWeeklyAvailability();
 
-    // Format time from "09:00 AM" to "09:00" for visual consistency with SS
+    // 12h → 24h labels for pills (e.g. third reference: 10:00, 11:30, 14:00)
     const formatTime = (timeStr) => {
-        return timeStr.replace(" AM", "").replace(" PM", "");
+        const m = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (!m) return timeStr;
+        let h = parseInt(m[1], 10);
+        const min = m[2];
+        const ap = m[3].toUpperCase();
+        if (ap === "PM" && h !== 12) h += 12;
+        if (ap === "AM" && h === 12) h = 0;
+        return `${String(h).padStart(2, "0")}:${min}`;
     };
 
     return (

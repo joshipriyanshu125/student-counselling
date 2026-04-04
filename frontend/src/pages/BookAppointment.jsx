@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Search } from "lucide-react";
 import API from "../api/api";
 import toast from "react-hot-toast";
+import { STANDARD_BOOKING_SLOTS } from "../constants/bookingTimes";
 
 const BookAppointment = () => {
 
@@ -190,9 +191,11 @@ const BookAppointment = () => {
                         onChange={(e) => setTime(e.target.value)}
                     >
                         <option value="">Select Time</option>
-                        <option value="10:00 AM">10:00 AM</option>
-                        <option value="11:30 AM">11:30 AM</option>
-                        <option value="2:00 PM">2:00 PM</option>
+                        {STANDARD_BOOKING_SLOTS.map((slot) => (
+                            <option key={slot} value={slot}>
+                                {slot}
+                            </option>
+                        ))}
                     </select>
 
                 </div>

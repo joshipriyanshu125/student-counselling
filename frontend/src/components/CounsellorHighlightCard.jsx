@@ -1,5 +1,6 @@
 import React from "react";
 import { Star, MapPin, Clock, Calendar, ChevronRight } from "lucide-react";
+import { STANDARD_BOOKING_SLOTS, WEEKDAYS } from "../constants/bookingTimes";
 
 const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => {
     
@@ -83,7 +84,10 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => 
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
                             <Clock className="w-4 h-4" />
-                            <span>Next: {counsellor.availability?.[0]?.day || "Soon"}, {counsellor.availability?.[0]?.slots?.[0] || "9:00 AM"}</span>
+                            <span>
+                                Next: {counsellor.availability?.[0]?.day || WEEKDAYS[0]},{" "}
+                                {counsellor.availability?.[0]?.slots?.[0] || STANDARD_BOOKING_SLOTS[0]}
+                            </span>
                         </div>
 
                         <div className="flex items-center gap-3 w-full sm:w-auto">
