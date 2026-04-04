@@ -12,6 +12,17 @@ import toast from "react-hot-toast";
 // ✅ ADDED
 import SupportChat from "../components/SupportChat";
 
+// ✅ NEW: Border color helper
+const getBorderColor = (spec) => {
+    switch (spec) {
+        case "Academic Guidance": return "border-t-indigo-500";
+        case "Career": return "border-t-amber-500";
+        case "Personal": return "border-t-rose-500";
+        case "Mental Wellness": return "border-t-emerald-500";
+        default: return "border-t-indigo-500";
+    }
+};
+
 const Dashboard = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
@@ -217,10 +228,10 @@ const Dashboard = () => {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Total Appointments - Premium Gradient Card */}
-                        <div className="relative overflow-hidden bg-[#6366f1] p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-100 group transition-all duration-500 hover:-translate-y-1">
+                        <div className="relative overflow-hidden bg-[#6366f1] p-8 rounded-[2rem] shadow-2xl shadow-indigo-100 group transition-all duration-500 hover:-translate-y-1">
                             <div className="relative z-10">
                                 <p className="text-white/70 font-bold text-[13px] uppercase tracking-[0.1em] mb-2">Total Appointments</p>
-                                <h3 className="text-6xl font-black text-white leading-tight">{stats.total}</h3>
+                                <h3 className="text-4xl font-black text-white leading-tight">{stats.total}</h3>
                                 <div className="mt-6">
                                     <span className="text-white/90 text-[13px] font-bold bg-white/20 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
                                         +{stats.thisMonthCount} this month
@@ -233,11 +244,11 @@ const Dashboard = () => {
                         </div>
 
                         {/* Sessions Completed */}
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group hover:-translate-y-1">
+                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 border-t-4 border-t-indigo-500 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group hover:-translate-y-1">
                             <div className="flex justify-between items-start mb-8">
                                 <div>
                                     <p className="text-slate-400 font-bold text-[13px] uppercase tracking-[0.1em] mb-2">Sessions Completed</p>
-                                    <h3 className="text-6xl font-black text-slate-900 leading-tight">{stats.completed}</h3>
+                                    <h3 className="text-4xl font-black text-slate-900 leading-tight">{stats.completed}</h3>
                                 </div>
                                 <div className="w-16 h-16 bg-indigo-50/50 rounded-[1.5rem] flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
                                     <MessageSquare className="w-8 h-8" strokeWidth={2.5} />
@@ -251,13 +262,13 @@ const Dashboard = () => {
                         {/* Counsellors Seen */}
                         <div 
                             onClick={() => navigate("/counsellors")}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-500 group hover:-translate-y-1 cursor-pointer relative overflow-hidden"
+                            className="bg-white p-8 rounded-[2rem] border border-slate-100 border-t-4 border-t-violet-500 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-500 group hover:-translate-y-1 cursor-pointer relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-24 h-24 bg-violet-600/5 rounded-bl-[4rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500"></div>
                             <div className="flex justify-between items-start mb-8 relative z-10">
                                 <div>
                                     <p className="text-slate-400 font-bold text-[13px] uppercase tracking-[0.1em] mb-2">Counsellors Seen</p>
-                                    <h3 className="text-6xl font-black text-slate-900 leading-tight">{stats.counsellors}</h3>
+                                    <h3 className="text-4xl font-black text-slate-900 leading-tight">{stats.counsellors}</h3>
                                 </div>
                                 <div className="w-16 h-16 bg-violet-50/50 rounded-[1.5rem] flex items-center justify-center text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-all duration-500">
                                     <Users className="w-8 h-8" strokeWidth={2.5} />
@@ -269,11 +280,11 @@ const Dashboard = () => {
                         </div>
 
                         {/* Avg. Rating Given */}
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group hover:-translate-y-1">
+                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 border-t-4 border-t-amber-500 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group hover:-translate-y-1">
                             <div className="flex justify-between items-start mb-8">
                                 <div>
                                     <p className="text-slate-400 font-bold text-[13px] uppercase tracking-[0.1em] mb-2">Avg. Rating Given</p>
-                                    <h3 className="text-6xl font-black text-slate-900 leading-tight">{stats.avgRating}</h3>
+                                    <h3 className="text-4xl font-black text-slate-900 leading-tight">{stats.avgRating}</h3>
                                 </div>
                                 <div className="w-16 h-16 bg-amber-50/50 rounded-[1.5rem] flex items-center justify-center text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-all duration-500">
                                     <Star className="w-8 h-8" strokeWidth={2.5} />
@@ -364,7 +375,7 @@ const Dashboard = () => {
                                 </div>
                             ) : (
                                 upcomingAppointments.slice(0, 3).map((apt) => (
-                                    <div key={apt._id} className="flex flex-col p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group relative">
+                                    <div key={apt._id} className={`flex flex-col p-6 rounded-[2rem] bg-white border border-slate-100 border-t-4 ${getBorderColor(apt.counsellor?.specialization)} shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group relative`}>
                                         <div className="flex items-start gap-4 mb-6">
                                             <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-100">
                                                 <User size={28} strokeWidth={2.5} />
@@ -374,7 +385,7 @@ const Dashboard = () => {
                                                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-slate-400 mt-1 font-bold">
                                                     <span className="flex items-center gap-1.5 uppercase tracking-wider">{apt.type}</span>
                                                     <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                                    <span className="flex items-center gap-1.5 whitespace-nowrap"><Calendar size={14} /> {new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                                                    <span className="flex items-center gap-1.5"><Calendar size={14} /> {new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                                                     <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                                                     <span className="flex items-center gap-1.5 flex-shrink-0"><Clock size={14} /> {apt.time || "10:00 AM"}</span>
                                                 </div>

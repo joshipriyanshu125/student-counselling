@@ -20,9 +20,19 @@ const AvailabilityModal = ({ isOpen, onClose, counsellor }) => {
         return `${String(h).padStart(2, "0")}:${min}`;
     };
 
+    const getBorderColor = (spec) => {
+        switch (spec) {
+            case "Academic Guidance": return "border-t-indigo-500";
+            case "Career": return "border-t-amber-500";
+            case "Personal": return "border-t-rose-500";
+            case "Mental Wellness": return "border-t-emerald-500";
+            default: return "border-t-indigo-500";
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-[#f8f9fc] rounded-[1.5rem] w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-200">
+            <div className={`bg-white rounded-[2rem] w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100 border-t-4 ${getBorderColor(counsellor.specialization)}`}>
                 
                 {/* Header */}
                 <div className="p-6 pb-2 flex items-center justify-between">

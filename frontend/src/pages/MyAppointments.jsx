@@ -125,31 +125,42 @@ const MyAppointments = () => {
                         );
                     }
 
-                    return filtered.map((apt) => (
-                        <div
-                            key={apt._id}
-                            className="bg-white border border-slate-100 rounded-3xl p-7 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden"
-                        >
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-indigo-600 group-hover:to-indigo-500 transition-all duration-300">
-                                        <User className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-xl font-black text-slate-800 tracking-tight">
-                                            {apt.counsellor?.fullName || "Professional Counsellor"}
-                                        </h4>
-                                        <div className="flex items-center gap-4 mt-1.5 font-bold text-slate-500 text-sm">
-                                            <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[11px]">{apt.type === "video" ? "Video Call" : apt.type === "audio" ? "Audio Call" : "In-Person"}</span>
-                                            <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                                            <span className="flex items-center gap-1.5"><Calendar size={15} /> {new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                                            <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                                            <span className="flex items-center gap-1.5"><Clock size={15} /> {apt.time}</span>
+                    return filtered.map((apt) => {
+                        const getBorderColor = (spec) => {
+                            switch (spec) {
+                                case "Academic Guidance": return "border-t-indigo-500";
+                                case "Career": return "border-t-amber-500";
+                                case "Personal": return "border-t-rose-500";
+                                case "Mental Wellness": return "border-t-emerald-500";
+                                default: return "border-t-indigo-500";
+                            }
+                        };
+
+                        return (
+                            <div
+                                key={apt._id}
+                                className={`bg-white border border-slate-100 border-t-4 ${getBorderColor(apt.counsellor?.specialization)} rounded-[2rem] p-7 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden`}
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-indigo-600 group-hover:to-indigo-500 transition-all duration-300">
+                                            <User className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xl font-black text-slate-800 tracking-tight">
+                                                {apt.counsellor?.fullName || "Professional Counsellor"}
+                                            </h4>
+                                            <div className="flex items-center gap-4 mt-1.5 font-bold text-slate-500 text-sm">
+                                                <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[11px]">{apt.type === "video" ? "Video Call" : apt.type === "audio" ? "Audio Call" : "In-Person"}</span>
+                                                <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                                                <span className="flex items-center gap-1.5"><Calendar size={15} /> {new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                                <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                                                <span className="flex items-center gap-1.5"><Clock size={15} /> {apt.time}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <StatusBadge status={apt.status} />
                                 </div>
-                                <StatusBadge status={apt.status} />
-                            </div>
 
                             {/* 🔥 JOIN BUTTON */}
                             {apt.status === "approved" && apt.type !== "in-person" && apt.roomId && (
@@ -185,7 +196,8 @@ const MyAppointments = () => {
                                 </div>
                             )}
                         </div>
-                    ));
+                        );
+                    });
                 })()}
             </div>
 

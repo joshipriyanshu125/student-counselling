@@ -26,8 +26,19 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => 
     
     const avatarColor = avatarColors[Math.abs(counsellor.fullName?.length || 0) % avatarColors.length];
 
+    // ✅ Top border color based on specialization
+    const getBorderColor = (spec) => {
+        switch (spec) {
+            case "Academic Guidance": return "border-t-indigo-500";
+            case "Career": return "border-t-amber-500";
+            case "Personal": return "border-t-rose-500";
+            case "Mental Wellness": return "border-t-emerald-500";
+            default: return "border-t-slate-200";
+        }
+    };
+
     return (
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500 border border-slate-100 group">
+        <div className={`bg-white rounded-[2rem] p-8 shadow-sm hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500 border border-slate-100 border-t-4 ${getBorderColor(counsellor.specialization)} group`}>
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Left: Avatar */}
                 <div className="shrink-0">
