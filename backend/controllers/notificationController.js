@@ -16,6 +16,20 @@ export const getNotifications = async (req, res) => {
     }
 };
 
+// GET UNREAD COUNT
+export const getUnreadCount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const count = await Notification.countDocuments({ user: userId, read: false });
+        res.json({
+            success: true,
+            count
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // MARK AS READ
 export const markNotificationRead = async (req, res) => {
     try {

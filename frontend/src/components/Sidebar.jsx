@@ -1,5 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import API from "../api/api";
 import {
     LayoutDashboard,
     Calendar,
@@ -14,8 +16,27 @@ import {
 } from "lucide-react";
 
 function Sidebar() {
-
     const location = useLocation();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        const fetchUnreadCount = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+                const res = await API.get("/notifications/unread-count");
+                if (res.data?.success) {
+                    setUnreadCount(res.data.count);
+                }
+            } catch (err) {
+                console.error("Failed to fetch unread count", err);
+            }
+        };
+
+        fetchUnreadCount();
+        const interval = setInterval(fetchUnreadCount, 5000); // 5 sec interval
+        return () => clearInterval(interval);
+    }, []);
 
     // get role from localStorage
     const role = localStorage.getItem("role");
@@ -76,13 +97,20 @@ function Sidebar() {
                                 <Link
                                     key={link.name}
                                     to={link.path}
-                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 ${isActive
+                                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors duration-200 ${isActive
                                             ? "bg-[#4338ca] text-white font-medium shadow-inner"
                                             : "text-indigo-100 hover:bg-white/10"
                                         }`}
                                 >
-                                    {link.icon}
-                                    <span>{link.name}</span>
+                                    <div className="flex items-center gap-3">
+                                        {link.icon}
+                                        <span>{link.name}</span>
+                                    </div>
+                                    {link.name === "Notifications" && unreadCount > 0 && (
+                                        <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px] h-[20px]">
+                                            {unreadCount > 99 ? "99+" : unreadCount}
+                                        </span>
+                                    )}
                                 </Link>
                             );
 
