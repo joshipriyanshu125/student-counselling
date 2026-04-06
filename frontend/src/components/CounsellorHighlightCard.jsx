@@ -1,8 +1,10 @@
 import React from "react";
-import { Star, MapPin, Clock, Calendar, ChevronRight } from "lucide-react";
+import { Star, MapPin, Clock, Calendar, ChevronRight, MessageSquare } from "lucide-react";
+
 import { STANDARD_BOOKING_SLOTS, WEEKDAYS } from "../constants/bookingTimes";
 
-const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => {
+const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook, onMessage }) => {
+
     
     // Generate initials for avatar
     const getInitials = (name) => {
@@ -103,6 +105,14 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => 
 
                         <div className="flex items-center gap-3 w-full sm:w-auto">
                             <button 
+                                onClick={() => onMessage(counsellor)}
+                                className="flex-1 sm:flex-none px-6 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all border border-indigo-100 shadow-sm"
+                            >
+                                <MessageSquare className="w-4 h-4" />
+                                Chat Now
+                            </button>
+
+                            <button 
                                 onClick={() => onViewAvailability(counsellor)}
                                 className="flex-1 sm:flex-none px-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all border border-slate-200"
                             >
@@ -117,6 +127,7 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook }) => 
                                 <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>

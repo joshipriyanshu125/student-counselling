@@ -54,6 +54,11 @@ const Counsellors = () => {
         navigate("/book-appointment", { state: { selectedCounsellorId: counsellor._id } });
     };
 
+    const handleMessage = (counsellor) => {
+        navigate("/messages", { state: { counsellor } });
+    };
+
+
     return (
         <div className="pb-20">
             {/* Header Section */}
@@ -139,7 +144,9 @@ const Counsellors = () => {
                             counsellor={counsellor}
                             onViewAvailability={handleViewAvailability}
                             onBook={handleBookNow}
+                            onMessage={handleMessage}
                         />
+
                     ))}
                 </div>
             ) : (

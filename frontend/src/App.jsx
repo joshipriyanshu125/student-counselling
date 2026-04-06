@@ -17,6 +17,8 @@ import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import Counsellors from "./pages/Counsellors";
+import Messages from "./pages/Messages";
+
 
 /* ✅ CALL PAGE */
 import CallPage from "./pages/CallPage";
@@ -208,6 +210,19 @@ function App() {
             </MainLayout>
           }
         />
+
+        {/* ✅ NEW: MESSAGES ROUTE */}
+        <Route
+          path="/messages"
+          element={
+            <MainLayout>
+              <PageTransition>
+                <Messages />
+              </PageTransition>
+            </MainLayout>
+          }
+        />
+
 
       </Routes>
     </AnimatePresence>

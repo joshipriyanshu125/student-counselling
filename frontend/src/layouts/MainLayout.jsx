@@ -27,19 +27,23 @@ function MainLayout({ children }) {
     const studentMenu = [
         { name: "Dashboard", path: "/dashboard", icon: LayoutGrid },
         { name: "Counsellors", path: "/counsellors", icon: Users },
+        { name: "Messages", path: "/messages", icon: MessageSquare },
         { name: "Appointments", path: "/my-appointments", icon: Calendar },
         { name: "Book Appointment", path: "/book-appointment", icon: BookOpen },
-        { name: "Sessions", path: "/sessions", icon: MessageSquare },
+        { name: "Sessions", path: "/sessions", icon: BookOpen },
         { name: "Feedback", path: "/feedback", icon: Star },
         { name: "Notifications", path: "/notifications", icon: Bell },
     ]
 
+
     const counsellorMenu = [
         { name: "Dashboard", path: "/counsellor-dashboard", icon: LayoutGrid },
+        { name: "Messages", path: "/messages", icon: MessageSquare },
         { name: "Appointments", path: "/counsellor-appointments", icon: Calendar },
-        { name: "Sessions", path: "/sessions", icon: MessageSquare },
+        { name: "Sessions", path: "/sessions", icon: BookOpen },
         { name: "Notifications", path: "/notifications", icon: Bell },
     ]
+
 
     const mainMenu = isCounsellor ? counsellorMenu : studentMenu
 

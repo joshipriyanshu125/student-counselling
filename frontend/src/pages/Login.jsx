@@ -19,8 +19,10 @@ const Login = () => {
         try {
             const res = await API.post("/auth/login", { email, password });
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
             localStorage.setItem("role", res.data.user.role);
             toast.success("Welcome back!");
+
 
             const role = res.data.user.role;
             if (role === "counsellor") {

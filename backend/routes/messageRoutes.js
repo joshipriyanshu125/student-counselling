@@ -1,14 +1,16 @@
 import express from "express";
-import Message from "../models/Message.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { getMessages, getConversations, markAsRead } from "../controllers/messageController.js";
 
 const router = express.Router();
 
-router.get("/:roomId", async (req, res) => {
-    const messages = await Message.find({
-        roomId: req.params.roomId,
-    }).sort({ createdAt: 1 });
+// Get history for a specific room
+router.get("/:roomId", protect, getMessages);
 
-    res.json(messages);
-});
+// Get all conversations list
+router.get("/conversations/all", protect, getConversations);
+
+// Mark as read
+router.patch("/read/:roomId", protect, markAsRead);
 
 export default router;
