@@ -110,48 +110,53 @@ const Messages = () => {
   }, [location.state, myId]);
 
 
-  // Handle Socket Events for Active Chat
+  // Handle Socket Events (Global and Room-specific)
   useEffect(() => {
-    if (socket && activeChat) {
-      socket.emit("join_room", activeChat.roomId);
+    if (socket && myId) {
+      // Join personal room for notifications
+      socket.emit("join_own_room", myId);
 
       const handleMessage = (message) => {
-        // Update active chat messages
+        // Update active chat messages if it matches
         if (activeChat && message.roomId === activeChat.roomId) {
           setMessages((prev) => [...prev, message]);
         }
 
-        // Update conversations list
+        // Update conversations list (move to top, update last message)
         setConversations((prev) => {
           const updated = [...prev];
           const index = updated.findIndex((c) => c.roomId === message.roomId);
           
           if (index !== -1) {
-            // Update existing conversation
             updated[index] = {
               ...updated[index],
               lastMessage: message.message,
               lastMessageTime: message.createdAt
             };
-            // Move to top
             const conv = updated.splice(index, 1)[0];
             return [conv, ...updated];
           } else {
-             // If we don't have this conversation in list yet, it will be fetched on next reload
-             // or we could fetch user info here and add it. For now, just let it be.
+             // If new conversation (not in list) - we should ideally fetch its info
+             // For now, this will refresh on next manual reload, but let's try to add it
+             // but we'd need partner info. For simplicity, we'll just let it be for now.
              return updated;
           }
         });
       };
 
-
       socket.on("receive_message", handleMessage);
+
+      // Also join active chat room if selected
+      if (activeChat) {
+        socket.emit("join_room", activeChat.roomId);
+      }
 
       return () => {
         socket.off("receive_message", handleMessage);
       };
     }
-  }, [socket, activeChat]);
+  }, [socket, myId, activeChat]);
+
 
   // Fetch Messages for Active Chat
   useEffect(() => {
@@ -204,14 +209,17 @@ const Messages = () => {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-black text-slate-800">Messages</h2>
-            <button 
-              onClick={() => navigate("/counsellors")}
-              className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-              title="Start New Chat"
-            >
-              <Plus size={20} strokeWidth={2.5} />
-            </button>
+            {myRole === "student" && (
+              <button 
+                onClick={() => navigate("/counsellors")}
+                className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                title="Start New Chat"
+              >
+                <Plus size={20} strokeWidth={2.5} />
+              </button>
+            )}
           </div>
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
 
@@ -268,14 +276,17 @@ const Messages = () => {
                 <MessageCircle className="text-slate-300" size={24} />
               </div>
               <p className="text-slate-400 text-sm font-medium mb-6">No conversations found</p>
-              <button 
-                onClick={() => navigate("/counsellors")}
-                className="w-full py-3 bg-white border border-indigo-100 text-indigo-600 font-bold rounded-2xl hover:bg-indigo-50 transition-all text-sm shadow-sm"
-              >
-                Find Counsellors
-              </button>
+              {myRole === "student" && (
+                <button 
+                  onClick={() => navigate("/counsellors")}
+                  className="w-full py-3 bg-white border border-indigo-100 text-indigo-600 font-bold rounded-2xl hover:bg-indigo-50 transition-all text-sm shadow-sm"
+                >
+                  Find Counsellors
+                </button>
+              )}
             </div>
           )}
+
 
         </div>
       </div>
@@ -387,18 +398,25 @@ const Messages = () => {
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border border-slate-100 mb-8 animate-bounce duration-[3000ms]">
               <Send className="text-indigo-500" size={40} />
             </div>
-            <h3 className="text-2xl font-black text-slate-800 mb-3">Start a conversation</h3>
+            <h3 className="text-2xl font-black text-slate-800 mb-3">
+              {myRole === "counsellor" ? "Your inbox is empty" : "Start a conversation"}
+            </h3>
             <p className="max-w-xs text-slate-500 font-medium leading-relaxed mb-8">
-              Select a counsellor to begin chatting before you book your session.
+              {myRole === "counsellor" 
+                ? "When students reach out to you, their messages will appear here."
+                : "Select a counsellor to begin chatting before you book your session."}
             </p>
-            <button 
-              onClick={() => navigate("/counsellors")}
-              className="px-8 py-3.5 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all flex items-center gap-2"
-            >
-              <Users className="w-5 h-5" />
-              Find Counsellors
-            </button>
+            {myRole === "student" && (
+              <button 
+                onClick={() => navigate("/counsellors")}
+                className="px-8 py-3.5 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all flex items-center gap-2"
+              >
+                <Users className="w-5 h-5" />
+                Find Counsellors
+              </button>
+            )}
           </div>
+
 
         )}
       </div>

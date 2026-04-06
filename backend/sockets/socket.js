@@ -10,6 +10,13 @@ const socketHandler = (io) => {
       console.log(`User ${socket.id} joined room: ${roomId}`);
     });
 
+    // Join catch-all room for any incoming messages
+    socket.on("join_own_room", (userId) => {
+      socket.join(`user_${userId}`);
+      console.log(`User ${socket.id} joined personal room: user_${userId}`);
+    });
+
+
     // Handle sending messages and saving to DB
     socket.on("send_message", async (data) => {
       try {
@@ -30,8 +37,9 @@ const socketHandler = (io) => {
           .populate("senderId", "fullName email role")
           .lean();
 
-        // Broadcast message to everyone in the room
+        // Broadcast to the room and specifically to the receiver's catch-all room
         io.to(roomId).emit("receive_message", populatedMessage);
+        io.to(`user_${receiverId}`).emit("receive_message", populatedMessage);
         
         console.log(`Message sent in room ${roomId} from ${senderId} to ${receiverId}`);
       } catch (err) {
