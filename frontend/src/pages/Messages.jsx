@@ -179,7 +179,11 @@ const Messages = () => {
           // Mark as read
           await API.patch(`/messages/read/${activeChat.roomId}`);
           
+          // Dispatch custom event to notify Sidebar (MainLayout)
+          window.dispatchEvent(new CustomEvent("REFRESH_MESSAGE_COUNT"));
+
           // Clear count in sidebar list locally
+
           setConversations(prev => prev.map(c => 
             c.roomId === activeChat.roomId ? { ...c, unreadCount: 0 } : c
           ));
@@ -312,27 +316,34 @@ const Messages = () => {
                   </div>
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                   {conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-in zoom-in duration-300">
-                      {conv.unreadCount}
+                    <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-600 rounded-full border-2 border-white animate-pulse">
                     </div>
                   )}
                 </div>
 
+
                 <div className="flex-1 text-left min-w-0">
                   <div className="flex justify-between items-center mb-0.5">
-                    <h4 className="font-bold text-slate-800 truncate">{conv.partner.fullName}</h4>
+                    <h4 className={`truncate ${
+                      conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId
+                        ? "font-black text-slate-900"
+                        : "font-bold text-slate-800"
+                    }`}>
+                      {conv.partner.fullName}
+                    </h4>
                     <span className="text-[10px] text-slate-400 font-bold uppercase">
                       {new Date(conv.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <p className={`text-xs truncate transition-all duration-200 ${
                     conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId
-                      ? "text-slate-900 font-extrabold"
+                      ? "text-indigo-600 font-bold"
                       : "text-slate-500 font-medium"
                   }`}>
                     {conv.lastMessage}
                   </p>
                 </div>
+
 
               </button>
             ))

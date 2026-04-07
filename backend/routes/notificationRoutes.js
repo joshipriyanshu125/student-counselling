@@ -11,10 +11,10 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/notifications/unread-count", protect, getUnreadCount);
-router.get("/notifications", protect, getNotifications);
+router.get("/unread-count", protect, getUnreadCount);
+router.get("/", protect, getNotifications);
 
-router.patch("/notifications/read-all", protect, markAllNotificationsRead);
-router.patch("/notifications/:id/read", protect, markNotificationRead);
+router.patch("/read-all", protect, markAllNotificationsRead);
+router.patch("/:id/read", protect, markNotificationRead);
 
-export default router;
+export default router;

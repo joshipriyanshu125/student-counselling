@@ -4,17 +4,18 @@ import { getMessages, getConversations, markAsRead, getTotalUnreadCount } from "
 
 const router = express.Router();
 
-// Get history for a specific room
-router.get("/:roomId", protect, getMessages);
+// Get total unread message count
+router.get("/unread-count", protect, getTotalUnreadCount);
 
 // Get all conversations list
 router.get("/conversations/all", protect, getConversations);
 
-// Get total unread message count
-router.get("/unread-count", protect, getTotalUnreadCount);
+// Get history for a specific room
+router.get("/:roomId", protect, getMessages);
 
 // Mark as read
 router.patch("/read/:roomId", protect, markAsRead);
+
 
 
 export default router;

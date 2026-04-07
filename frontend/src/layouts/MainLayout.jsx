@@ -1,5 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import API from "../api/api";
+import { io } from "socket.io-client";
+
+
 
 import {
     Bell,
@@ -25,6 +28,8 @@ function MainLayout({ children }) {
 
     const [showSupport, setShowSupport] = useState(false)   // ✅ ADDED
     const [unreadMessages, setUnreadMessages] = useState(0)
+    const [unreadNotifications, setUnreadNotifications] = useState(0)
+
 
 
     const isCounsellor = localStorage.getItem("role") === "counsellor"
@@ -52,21 +57,48 @@ function MainLayout({ children }) {
 
 
     useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const userId = user.id || user._id;
+
         const fetchCounts = async () => {
             try {
-                const res = await API.get("/messages/unread-count")
-                if (res.data?.success) {
-                    setUnreadMessages(res.data.count)
+                const msgRes = await API.get("/messages/unread-count")
+                if (msgRes.data?.success) {
+                    setUnreadMessages(msgRes.data.count)
+                }
+
+                const notifRes = await API.get("/notifications/unread-count")
+                if (notifRes.data?.success) {
+                    setUnreadNotifications(notifRes.data.count)
                 }
             } catch (err) {
-                console.error("Error fetching unread message count", err)
+                console.error("Error fetching unread counts", err)
             }
         }
 
+        // Initialize Socket for global notifications
+        const socket = io("http://localhost:5000");
+        if (userId) {
+            socket.emit("join_own_room", userId);
+        }
+
+        const handleRefresh = () => {
+            fetchCounts();
+        };
+
+        socket.on("receive_message", handleRefresh);
+        window.addEventListener("REFRESH_MESSAGE_COUNT", handleRefresh);
+
         fetchCounts()
         const interval = setInterval(fetchCounts, 10000) // 10s interval
-        return () => clearInterval(interval)
+
+        return () => {
+            clearInterval(interval);
+            socket.disconnect();
+            window.removeEventListener("REFRESH_MESSAGE_COUNT", handleRefresh);
+        }
     }, [])
+
 
     const mainMenu = isCounsellor ? counsellorMenu : studentMenu
 
@@ -130,7 +162,13 @@ function MainLayout({ children }) {
                                                 {unreadMessages}
                                             </span>
                                         )}
+                                        {item.name === "Notifications" && unreadNotifications > 0 && (
+                                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px] h-[20px] animate-in zoom-in duration-300">
+                                                {unreadNotifications}
+                                            </span>
+                                        )}
                                     </button>
+
 
                                 )
                             })}
