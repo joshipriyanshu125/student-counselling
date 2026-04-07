@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
-import { getMessages, getConversations, markAsRead } from "../controllers/messageController.js";
+import { getMessages, getConversations, markAsRead, getTotalUnreadCount } from "../controllers/messageController.js";
 
 const router = express.Router();
 
@@ -10,7 +10,11 @@ router.get("/:roomId", protect, getMessages);
 // Get all conversations list
 router.get("/conversations/all", protect, getConversations);
 
+// Get total unread message count
+router.get("/unread-count", protect, getTotalUnreadCount);
+
 // Mark as read
 router.patch("/read/:roomId", protect, markAsRead);
+
 
 export default router;

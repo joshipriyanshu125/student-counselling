@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom"
+import API from "../api/api";
+
 import {
     Bell,
     LayoutGrid,
@@ -13,7 +15,8 @@ import {
 
 import NotificationDropdown from "../components/NotificationDropdown"
 import SupportModal from "../components/SupportModal"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
 
 function MainLayout({ children }) {
 
@@ -21,6 +24,8 @@ function MainLayout({ children }) {
     const location = useLocation()
 
     const [showSupport, setShowSupport] = useState(false)   // ✅ ADDED
+    const [unreadMessages, setUnreadMessages] = useState(0)
+
 
     const isCounsellor = localStorage.getItem("role") === "counsellor"
 
@@ -45,7 +50,26 @@ function MainLayout({ children }) {
     ]
 
 
+
+    useEffect(() => {
+        const fetchCounts = async () => {
+            try {
+                const res = await API.get("/messages/unread-count")
+                if (res.data?.success) {
+                    setUnreadMessages(res.data.count)
+                }
+            } catch (err) {
+                console.error("Error fetching unread message count", err)
+            }
+        }
+
+        fetchCounts()
+        const interval = setInterval(fetchCounts, 10000) // 10s interval
+        return () => clearInterval(interval)
+    }, [])
+
     const mainMenu = isCounsellor ? counsellorMenu : studentMenu
+
 
     const accountMenu = [
         { name: "Profile", path: "/profile", icon: User },
@@ -101,7 +125,13 @@ function MainLayout({ children }) {
                                         <span className="text-[15px]">
                                             {item.name}
                                         </span>
+                                        {item.name === "Messages" && unreadMessages > 0 && (
+                                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px] h-[20px] animate-in zoom-in duration-300">
+                                                {unreadMessages}
+                                            </span>
+                                        )}
                                     </button>
+
                                 )
                             })}
                         </nav>

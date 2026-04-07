@@ -20,6 +20,10 @@ import counsellorRoutes from "./routes/counsellorRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 // Socket
 import socketHandler from "./sockets/socket.js";
@@ -50,6 +54,11 @@ app.use(
 
 // Body Parser
 app.use(express.json());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 /* ================= PROFILE ROUTES ================= */
 
@@ -146,6 +155,8 @@ app.use("/api", counsellorRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/upload", uploadRoutes);
+
 
 // Test Route
 app.get("/", (req, res) => {

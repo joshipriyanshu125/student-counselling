@@ -20,7 +20,7 @@ const socketHandler = (io) => {
     // Handle sending messages and saving to DB
     socket.on("send_message", async (data) => {
       try {
-        const { roomId, senderId, receiverId, message } = data;
+        const { roomId, senderId, receiverId, message, fileUrl, fileType } = data;
 
         // Create and save message
         const newMessage = new Message({
@@ -28,6 +28,8 @@ const socketHandler = (io) => {
           senderId,
           receiverId,
           message,
+          fileUrl,
+          fileType,
         });
 
         const savedMessage = await newMessage.save();

@@ -52,15 +52,23 @@ export const getConversations = async (req, res) => {
         
         const partner = await User.findById(partnerId).select("fullName email role specialization bio");
         
+        // Count unread messages for this specific room where the user is the receiver
+        const unreadCount = await Message.countDocuments({
+          roomId: msg.roomId,
+          receiverId: userId,
+          isRead: false
+        });
+
         conversations.push({
           partner,
-          lastMessage: msg.message,
+          lastMessage: msg.message || (msg.fileUrl ? "Sent an attachment" : ""),
           lastMessageTime: msg.createdAt,
           roomId: msg.roomId,
-          unreadCount: 0, // Placeholder
+          unreadCount: unreadCount,
         });
       }
     }
+
 
     res.status(200).json({
       success: true,
@@ -100,3 +108,29 @@ export const markAsRead = async (req, res) => {
     });
   }
 };
+
+// @desc    Get total unread message count for the current user
+// @route   GET /api/messages/unread-count
+// @access  Private
+export const getTotalUnreadCount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const count = await Message.countDocuments({
+      receiverId: userId,
+      isRead: false
+    });
+
+    res.status(200).json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching total unread count",
+      error: error.message,
+    });
+  }
+};
+

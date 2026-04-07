@@ -24,6 +24,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/api";
 import toast from "react-hot-toast";
+import EmojiPicker from "emoji-picker-react";
+import { File, X, Download } from "lucide-react";
+
 
 const SOCKET_URL = "http://localhost:5000";
 
@@ -41,6 +44,11 @@ const Messages = () => {
   const [socket, setSocket] = useState(null);
   
   const scrollRef = useRef();
+  const fileInputRef = useRef();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user") || "null"));
   const myId = currentUser?.id || currentUser?._id;
   const myRole = localStorage.getItem("role");
@@ -128,14 +136,17 @@ const Messages = () => {
           const index = updated.findIndex((c) => c.roomId === message.roomId);
           
           if (index !== -1) {
+            const isRead = activeChat?.roomId === message.roomId;
             updated[index] = {
               ...updated[index],
-              lastMessage: message.message,
-              lastMessageTime: message.createdAt
+              lastMessage: message.message || (message.fileUrl ? "Sent an attachment" : ""),
+              lastMessageTime: message.createdAt,
+              unreadCount: isRead ? 0 : (updated[index].unreadCount || 0) + 1,
             };
             const conv = updated.splice(index, 1)[0];
             return [conv, ...updated];
-          } else {
+          }
+ else {
              // If new conversation (not in list) - we should ideally fetch its info
              // For now, this will refresh on next manual reload, but let's try to add it
              // but we'd need partner info. For simplicity, we'll just let it be for now.
@@ -167,7 +178,13 @@ const Messages = () => {
           setMessages(res.data.data);
           // Mark as read
           await API.patch(`/messages/read/${activeChat.roomId}`);
+          
+          // Clear count in sidebar list locally
+          setConversations(prev => prev.map(c => 
+            c.roomId === activeChat.roomId ? { ...c, unreadCount: 0 } : c
+          ));
         } catch (err) {
+
           console.error("Failed to fetch messages", err);
         }
       };
@@ -183,18 +200,56 @@ const Messages = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeChat || !socket) return;
+    if ((!newMessage.trim() && !selectedFile) || !activeChat || !socket) return;
+
+    let fileData = null;
+    if (selectedFile) {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      try {
+        const res = await API.post("/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        fileData = res.data;
+      } catch (err) {
+        toast.error("Failed to upload file");
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
 
     const messageData = {
       roomId: activeChat.roomId,
       senderId: myId,
       receiverId: activeChat.partner._id,
       message: newMessage,
+      fileUrl: fileData?.fileUrl,
+      fileType: fileData?.fileType,
     };
 
     socket.emit("send_message", messageData);
     setNewMessage("");
+    setSelectedFile(null);
+    setShowEmojiPicker(false);
   };
+
+  const onEmojiClick = (emojiData) => {
+    setNewMessage((prev) => prev + emojiData.emoji);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
 
   const filteredConversations = conversations.filter(conv => 
     conv.partner?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -256,7 +311,13 @@ const Messages = () => {
                     {conv.partner.fullName.charAt(0)}
                   </div>
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                  {conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-in zoom-in duration-300">
+                      {conv.unreadCount}
+                    </div>
+                  )}
                 </div>
+
                 <div className="flex-1 text-left min-w-0">
                   <div className="flex justify-between items-center mb-0.5">
                     <h4 className="font-bold text-slate-800 truncate">{conv.partner.fullName}</h4>
@@ -264,10 +325,15 @@ const Messages = () => {
                       {new Date(conv.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 truncate font-medium">
+                  <p className={`text-xs truncate transition-all duration-200 ${
+                    conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId
+                      ? "text-slate-900 font-extrabold"
+                      : "text-slate-500 font-medium"
+                  }`}>
                     {conv.lastMessage}
                   </p>
                 </div>
+
               </button>
             ))
           ) : (
@@ -348,8 +414,34 @@ const Messages = () => {
                             ? "bg-indigo-600 text-white rounded-tr-none" 
                             : "bg-slate-100 text-slate-800 rounded-tl-none"
                         }`}>
+                          {msg.fileUrl && (
+                            <div className="mb-2">
+                              {msg.fileType?.startsWith("image/") ? (
+                                <img 
+                                  src={`http://localhost:5000${msg.fileUrl}`} 
+                                  alt="attachment" 
+                                  className="max-w-full rounded-2xl mb-2 cursor-pointer hover:opacity-90 transition-opacity" 
+                                  onClick={() => window.open(`http://localhost:5000${msg.fileUrl}`, "_blank")}
+                                />
+                              ) : (
+                                <div className={`flex items-center gap-3 p-3 rounded-2xl ${isMine ? "bg-indigo-500" : "bg-white"} border ${isMine ? "border-indigo-400" : "border-slate-200"}`}>
+                                  <div className={`p-2 rounded-xl ${isMine ? "bg-indigo-400" : "bg-indigo-50"} text-indigo-600`}>
+                                    <File size={20} className={isMine ? "text-white" : "text-indigo-600"} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`text-xs font-bold truncate ${isMine ? "text-white" : "text-slate-800"}`}>Attachment</p>
+                                    <p className={`text-[10px] ${isMine ? "text-indigo-100" : "text-slate-400"}`}>Click to download</p>
+                                  </div>
+                                  <a href={`http://localhost:5000${msg.fileUrl}`} target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full hover:bg-black/10 transition-colors`}>
+                                    <Download size={16} className={isMine ? "text-white" : "text-slate-600"} />
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          )}
                           {msg.message}
                         </div>
+
                         <div className={`flex items-center gap-1.5 mt-1.5 px-1 ${isMine ? "justify-end" : "justify-start"}`}>
                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
                             {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -367,9 +459,54 @@ const Messages = () => {
             </div>
 
             {/* Message Input */}
-            <div className="p-4 md:p-6 border-t border-slate-100">
+            <div className="p-4 md:p-6 border-t border-slate-100 relative">
+              {showEmojiPicker && (
+                <div className="absolute bottom-full right-4 z-50 mb-4 animate-in slide-in-from-bottom-2 duration-200">
+                  <div className="fixed inset-0" onClick={() => setShowEmojiPicker(false)}></div>
+                  <div className="relative">
+                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                  </div>
+                </div>
+              )}
+
+              {selectedFile && (
+                <div className="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between animate-in fade-in zoom-in duration-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                      {selectedFile.type.startsWith("image/") ? (
+                        <div className="w-full h-full rounded-xl overflow-hidden">
+                          <img src={URL.createObjectURL(selectedFile)} alt="preview" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <File size={20} />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate max-w-[200px]">{selectedFile.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedFile(null)}
+                    className="p-1.5 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+
               <form onSubmit={handleSendMessage} className="flex items-center gap-3 md:gap-4 bg-slate-50 p-2 md:p-3 rounded-[2rem] border border-slate-200 focus-within:border-indigo-300 focus-within:ring-4 focus-within:ring-indigo-100 transition-all duration-300">
-                <button type="button" className="p-2 md:p-2.5 text-slate-400 hover:text-indigo-600 transition-colors">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  className="hidden" 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => fileInputRef.current.click()}
+                  className={`p-2 md:p-2.5 transition-colors ${selectedFile ? 'text-indigo-600 bg-indigo-50 rounded-full' : 'text-slate-400 hover:text-indigo-600'}`}
+                >
                   <Paperclip size={20} />
                 </button>
                 <input 
@@ -378,20 +515,31 @@ const Messages = () => {
                   className="flex-1 bg-transparent border-none focus:outline-none text-slate-800 font-medium text-sm px-2"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onFocus={() => setShowEmojiPicker(false)}
                 />
                 <div className="flex items-center gap-1 pr-1">
-                  <button type="button" className="hidden sm:block p-2 text-slate-400 hover:text-indigo-600 transition-colors">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className={`hidden sm:block p-2 transition-colors ${showEmojiPicker ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`}
+                  >
                     <Smile size={20} />
                   </button>
                   <button 
                     type="submit" 
-                    className="p-2 md:p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 shadow-md shadow-indigo-200 active:scale-95 transition-all"
+                    disabled={isUploading}
+                    className={`p-2 md:p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 shadow-md shadow-indigo-200 active:scale-95 transition-all ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <Send size={20} strokeWidth={2.5} />
+                    {isUploading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      <Send size={20} strokeWidth={2.5} />
+                    )}
                   </button>
                 </div>
               </form>
             </div>
+
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50/30">

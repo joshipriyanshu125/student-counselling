@@ -19,7 +19,13 @@ const messageSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      required: true,
+      required: function() { return !this.fileUrl; }, // Either message or file must be present
+    },
+    fileUrl: {
+      type: String,
+    },
+    fileType: {
+      type: String,
     },
     isRead: {
       type: Boolean,
