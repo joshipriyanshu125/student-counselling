@@ -1,4 +1,6 @@
-import { Search, Bell, LogOut } from "lucide-react";
+import { Search, LogOut } from "lucide-react";
+import NotificationDropdown from "./NotificationDropdown";
+
 
 function Navbar() {
     return (
@@ -19,12 +21,8 @@ function Navbar() {
             </div>
 
             <div className="flex items-center gap-6 text-slate-500">
-                <button className="relative p-2 hover:text-indigo-600 transition-colors">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border border-white">
-                        3
-                    </span>
-                </button>
+                <NotificationDropdown />
+
 
                 <button className="p-2 hover:text-indigo-600 transition-colors">
                     <LogOut className="w-5 h-5" />

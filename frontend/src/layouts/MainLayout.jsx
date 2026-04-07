@@ -86,10 +86,22 @@ function MainLayout({ children }) {
             fetchCounts();
         };
 
+        const handleNewNotification = (data) => {
+            fetchCounts();
+            window.dispatchEvent(new CustomEvent("REFRESH_NOTIFICATIONS", { detail: data }));
+            // Optional: show a small toast for new notifications if not on notification page
+            if (location.pathname !== "/notifications") {
+                toast.success(data.message, { icon: "🔔" });
+            }
+        };
+
         socket.on("receive_message", handleRefresh);
+        socket.on("new_notification", handleNewNotification);
+        
         window.addEventListener("REFRESH_MESSAGE_COUNT", handleRefresh);
 
         fetchCounts()
+
         const interval = setInterval(fetchCounts, 10000) // 10s interval
 
         return () => {

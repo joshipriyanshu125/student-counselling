@@ -3,6 +3,9 @@ import { Bell } from "lucide-react"
 import NotificationList from "./NotificationList"
 import API from "../api/api"
 import toast from "react-hot-toast"
+import { motion, AnimatePresence } from "framer-motion"
+import { Link } from "react-router-dom"
+
 
 function NotificationDropdown() {
 
@@ -40,7 +43,7 @@ function NotificationDropdown() {
 
             setNotifications(data)
 
-        } catch (error) {
+        } catch {
             // Silently fail on poll errors (only toast on first load)
             setNotifications(prev => prev)
         }
@@ -52,11 +55,13 @@ function NotificationDropdown() {
         fetchNotifications()
     }, [])
 
-    // Poll every 3 seconds for faster meeting alerts when counsellor starts the session
+    // Real-time update listener
     useEffect(() => {
-        const interval = setInterval(fetchNotifications, 3000)
-        return () => clearInterval(interval)
+        const handleRefresh = () => fetchNotifications()
+        window.addEventListener("REFRESH_NOTIFICATIONS", handleRefresh)
+        return () => window.removeEventListener("REFRESH_NOTIFICATIONS", handleRefresh)
     }, [])
+
 
 
     /* Mark notification as read */
@@ -151,31 +156,45 @@ function NotificationDropdown() {
             </button>
 
             {/* Dropdown Panel */}
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden"
+                    >
+                        <div className="p-4 border-b bg-slate-50/50 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center">
+                            <span className="font-bold text-slate-800">Notifications</span>
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={markAllAsRead}
+                                    className="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline transition-all"
+                                >
+                                    Mark all read
+                                </button>
+                            )}
+                        </div>
 
-            {open && (
+                        <NotificationList
+                            notifications={Array.isArray(notifications) ? notifications : []}
+                            markAsRead={markAsRead}
+                        />
 
-                <div className="absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-lg z-50">
-
-                    <div className="p-4 border-b font-semibold text-slate-700 flex justify-between items-center">
-                        <span>Notifications</span>
-                        {unreadCount > 0 && (
-                            <button
-                                onClick={markAllAsRead}
-                                className="text-xs text-indigo-600 hover:underline font-normal"
+                        <div className="p-3 border-t bg-slate-50/30 text-center">
+                            <Link 
+                                to="/notifications" 
+                                onClick={() => setOpen(false)}
+                                className="text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors uppercase tracking-widest"
                             >
-                                Mark all as read
-                            </button>
-                        )}
-                    </div>
+                                View All Notifications
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                    <NotificationList
-                        notifications={Array.isArray(notifications) ? notifications : []}
-                        markAsRead={markAsRead}
-                    />
-
-                </div>
-
-            )}
 
         </div>
     )

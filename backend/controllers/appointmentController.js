@@ -22,12 +22,16 @@ export const bookAppointment = async (req, res) => {
 
         await appointment.save();
 
-        await Notification.create({
+        const notification = await Notification.create({
             user: counsellorId,
             message: "You have a new appointment request.",
             type: "general",
             appointmentId: appointment._id
         });
+
+        // Emit real-time notification
+        req.app.get("io").to(`user_${counsellorId}`).emit("new_notification", notification);
+
 
         res.status(201).json({
             success: true,
@@ -102,12 +106,16 @@ export const updateAppointmentStatus = async (req, res) => {
             pending: "Your appointment status has been updated."
         };
 
-        await Notification.create({
+        const notification = await Notification.create({
             user: appointment.student,
             message: statusMessageMap[status] || "Your appointment status has been updated.",
             type: "general",
             appointmentId: appointment._id
         });
+
+        // Emit real-time notification
+        req.app.get("io").to(`user_${appointment.student}`).emit("new_notification", notification);
+
 
         res.json({
             success: true,
@@ -157,12 +165,16 @@ export const startMeeting = async (req, res) => {
         await appointment.save();
 
         // Send Notification to student
-        await Notification.create({
+        const notification = await Notification.create({
             user: appointment.student,
             message: `Your counsellor has started the ${appointment.type} meeting session.`,
             type: "meeting_started",
             appointmentId: appointment._id
         });
+
+        // Emit real-time notification
+        req.app.get("io").to(`user_${appointment.student}`).emit("new_notification", notification);
+
 
         res.json({
             success: true,

@@ -185,7 +185,11 @@ const io = new Server(server, {
     },
 });
 
+// Attach io to app so it can be used in controllers
+app.set("io", io);
+
 socketHandler(io);
+
 
 /* ================= SERVER START ================= */
 
