@@ -50,6 +50,13 @@ router.put("/profile", protect, async (req, res) => {
     user.studentId = req.body.studentId || user.studentId;
     user.program = req.body.program || user.program;
 
+    if (req.body.notificationPreferences) {
+      user.notificationPreferences = {
+        ...user.notificationPreferences,
+        ...req.body.notificationPreferences
+      };
+    }
+
     const updatedUser = await user.save();
 
     res.json(updatedUser);

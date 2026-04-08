@@ -1,8 +1,9 @@
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaIdCard } from "react-icons/fa"
+import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaIdCard, FaCalendarAlt, FaComments, FaFileAlt, FaExclamationTriangle, FaBell, FaSave } from "react-icons/fa"
 import Button from "../components/Button"
 import InputField from "../components/InputField"
+import Toggle from "../components/Toggle"
 import API from "../api/api"
 import toast from "react-hot-toast"
 
@@ -14,7 +15,14 @@ function Profile() {
         phone: "",
         studentId: "",
         program: "",
-        role: ""
+        role: "",
+        notificationPreferences: {
+            appointmentReminders: { email: true, push: true },
+            newMessages: { email: true, push: true },
+            sessionNotes: { email: true, push: false },
+            systemAlerts: { email: true, push: true },
+            feedbackRequests: { email: false, push: true }
+        }
     })
 
     const [editMode, setEditMode] = useState(false)
@@ -36,7 +44,14 @@ function Profile() {
                         phone: res.data.phone || "",
                         studentId: res.data.studentId || "",
                         program: res.data.program || "",
-                        role: res.data.role || "student"
+                        role: res.data.role || "student",
+                        notificationPreferences: res.data.notificationPreferences || {
+                            appointmentReminders: { email: true, push: true },
+                            newMessages: { email: true, push: true },
+                            sessionNotes: { email: true, push: false },
+                            systemAlerts: { email: true, push: true },
+                            feedbackRequests: { email: false, push: true }
+                        }
                     })
                 }
 
@@ -213,6 +228,141 @@ function Profile() {
                     </div>
 
                 )}
+
+            </div>
+
+
+            {/* Notification Preferences Section */}
+
+            <div className="bg-white rounded-[2.5rem] shadow-sm p-8 sm:p-12 border border-slate-100 group hover:shadow-xl transition-all duration-500">
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-6">
+
+                    <div className="flex items-center gap-5">
+                        <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600">
+                            <FaEnvelope className="text-2xl" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+                                Notification Preferences
+                            </h3>
+                            <p className="text-slate-400 font-bold text-sm tracking-wider uppercase mt-1">Manage your alerts</p>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3.5 rounded-2xl shadow-lg shadow-indigo-100 transition-all active:scale-95 text-xs uppercase tracking-widest"
+                    >
+                        <FaSave />
+                        Save Preferences
+                    </button>
+
+                </div>
+
+
+                <div className="space-y-2">
+
+                    {/* Column Labels */}
+                    <div className="grid grid-cols-12 mb-6 px-6">
+                        <div className="col-span-8"></div>
+                        <div className="col-span-2 text-center text-slate-400 text-[11px] font-black uppercase tracking-widest">Email</div>
+                        <div className="col-span-2 text-center text-slate-400 text-[11px] font-black uppercase tracking-widest">Push</div>
+                    </div>
+
+
+                    {/* Preference Rows */}
+
+                    {[
+                        { 
+                            id: "appointmentReminders", 
+                            label: "Appointment Reminders", 
+                            desc: "Get notified before upcoming appointments", 
+                            icon: FaCalendarAlt,
+                            color: "bg-indigo-50 text-indigo-600" 
+                        },
+                        { 
+                            id: "newMessages", 
+                            label: "New Messages", 
+                            desc: "When a counsellor sends you a message", 
+                            icon: FaComments,
+                            color: "bg-blue-50 text-blue-600" 
+                        },
+                        { 
+                            id: "sessionNotes", 
+                            label: "Session Notes", 
+                            desc: "When session notes are shared with you", 
+                            icon: FaFileAlt,
+                            color: "bg-violet-50 text-violet-600" 
+                        },
+                        { 
+                            id: "systemAlerts", 
+                            label: "System Alerts", 
+                            desc: "Important system updates and announcements", 
+                            icon: FaExclamationTriangle,
+                            color: "bg-rose-50 text-rose-600" 
+                        },
+                        { 
+                            id: "feedbackRequests", 
+                            label: "Feedback Requests", 
+                            desc: "Reminders to submit session feedback", 
+                            icon: FaBell,
+                            color: "bg-amber-50 text-amber-600" 
+                        }
+                    ].map((item) => (
+                        <div 
+                            key={item.id}
+                            className="grid grid-cols-12 items-center py-6 px-6 hover:bg-slate-50 rounded-[2rem] transition-all duration-300 border-b border-slate-50 last:border-0"
+                        >
+                            <div className="col-span-8 flex items-center gap-5">
+                                <div className={`w-12 h-12 flex items-center justify-center rounded-2xl ${item.color} shadow-sm`}>
+                                    <item.icon className="text-xl" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="font-extrabold text-slate-800 text-lg leading-tight">{item.label}</p>
+                                    <p className="text-sm text-slate-400 font-bold mt-1 truncate">{item.desc}</p>
+                                </div>
+                            </div>
+
+                            <div className="col-span-2 flex justify-center">
+                                <Toggle 
+                                    enabled={profile.notificationPreferences?.[item.id]?.email}
+                                    onChange={(val) => {
+                                        setProfile({
+                                            ...profile,
+                                            notificationPreferences: {
+                                                ...profile.notificationPreferences,
+                                                [item.id]: {
+                                                    ...profile.notificationPreferences?.[item.id],
+                                                    email: val
+                                                }
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+
+                            <div className="col-span-2 flex justify-center">
+                                <Toggle 
+                                    enabled={profile.notificationPreferences?.[item.id]?.push}
+                                    onChange={(val) => {
+                                        setProfile({
+                                            ...profile,
+                                            notificationPreferences: {
+                                                ...profile.notificationPreferences,
+                                                [item.id]: {
+                                                    ...profile.notificationPreferences?.[item.id],
+                                                    push: val
+                                                }
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    ))}
+
+                </div>
 
             </div>
 

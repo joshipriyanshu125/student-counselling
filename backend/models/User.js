@@ -93,6 +93,29 @@ const userSchema = new mongoose.Schema(
                 slots: [String],
             }
         ],
+
+        notificationPreferences: {
+            appointmentReminders: {
+                email: { type: Boolean, default: true },
+                push: { type: Boolean, default: true }
+            },
+            newMessages: {
+                email: { type: Boolean, default: true },
+                push: { type: Boolean, default: true }
+            },
+            sessionNotes: {
+                email: { type: Boolean, default: true },
+                push: { type: Boolean, default: false }
+            },
+            systemAlerts: {
+                email: { type: Boolean, default: true },
+                push: { type: Boolean, default: true }
+            },
+            feedbackRequests: {
+                email: { type: Boolean, default: false },
+                push: { type: Boolean, default: true }
+            }
+        }
     },
     {
         timestamps: true,
