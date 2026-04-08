@@ -114,6 +114,32 @@ function NotificationDropdown() {
     }
 
 
+    /* Dismiss a notification */
+
+    const dismissNotification = async (id) => {
+
+        try {
+            console.log("Dismissing notification ID:", id);
+            const res = await API.delete(`/notifications/${id}`)
+            console.log("Dismiss response:", res.data);
+
+            setNotifications(prev =>
+                Array.isArray(prev)
+                    ? prev.filter(n => n._id !== id)
+                    : []
+            )
+
+            toast.success("Notification dismissed")
+
+        } catch (error) {
+            console.error("Dismiss error:", error);
+            const msg = error.response?.data?.message || "Failed to dismiss notification";
+            toast.error(msg);
+        }
+
+    }
+
+
 
     /* Close dropdown when clicking outside */
 
@@ -180,6 +206,7 @@ function NotificationDropdown() {
                         <NotificationList
                             notifications={Array.isArray(notifications) ? notifications : []}
                             markAsRead={markAsRead}
+                            dismissNotification={dismissNotification}
                         />
 
                         <div className="p-3 border-t bg-slate-50/30 text-center">

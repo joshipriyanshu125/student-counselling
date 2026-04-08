@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom"
-import { Video, Phone, Bell, Calendar, MessageSquare, Clock } from "lucide-react"
+import { Video, Phone, Bell, Calendar, MessageSquare, Clock, X, Check } from "lucide-react"
 
 
 import { canJoinMeeting } from "../utils/canJoinMeeting"
 import toast from "react-hot-toast"
 
-function NotificationList({ notifications, markAsRead }) {
+function NotificationList({ notifications, markAsRead, dismissNotification }) {
 
     const navigate = useNavigate()
 
@@ -51,9 +51,20 @@ function NotificationList({ notifications, markAsRead }) {
                             
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start mb-1">
-                                    <p className={`text-sm leading-snug ${!n.read ? "text-slate-900 font-bold" : "text-slate-600 font-medium"}`}>
+                                    <p className={`text-sm leading-snug pr-8 ${!n.read ? "text-slate-900 font-bold" : "text-slate-600 font-medium"}`}>
                                         {n.message}
                                     </p>
+                                    
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            dismissNotification(n._id);
+                                        }}
+                                        className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-40 hover:opacity-100 transition-opacity p-1.5 hover:bg-red-50 rounded-full bg-white/50 border border-transparent hover:border-red-100 shadow-sm"
+                                        title="Dismiss"
+                                    >
+                                        <X size={14} />
+                                    </button>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -68,8 +79,9 @@ function NotificationList({ notifications, markAsRead }) {
                                                 e.stopPropagation();
                                                 markAsRead(n._id);
                                             }}
-                                            className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
+                                            <Check size={10} />
                                             Mark Read
                                         </button>
                                     )}
@@ -117,4 +129,4 @@ function NotificationList({ notifications, markAsRead }) {
     )
 }
 
-export default NotificationList
+export default NotificationList;

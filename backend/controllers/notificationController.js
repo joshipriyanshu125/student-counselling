@@ -56,3 +56,25 @@ export const markAllNotificationsRead = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// DELETE INDIVIDUAL NOTIFICATION
+export const deleteNotification = async (req, res) => {
+    try {
+        console.log(`Deleting notification: ${req.params.id} for user: ${req.user._id}`);
+        const notification = await Notification.findOneAndDelete({
+            _id: req.params.id,
+            user: req.user._id
+        });
+
+        if (!notification) {
+            console.log("Notification not found or doesn't belong to user");
+            return res.status(404).json({ message: "Notification not found" });
+        }
+
+        console.log("Notification deleted successfully");
+        res.json({ message: "Notification dismissed", notification });
+    } catch (error) {
+        console.error("Delete notification error:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
