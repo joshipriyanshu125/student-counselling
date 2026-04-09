@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Appointment from "../models/Appointment.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
+import sendEmail from "../utils/sendEmail.js";
 
 // BOOK APPOINTMENT
 export const bookAppointment = async (req, res) => {
@@ -31,6 +32,14 @@ export const bookAppointment = async (req, res) => {
 
         // Emit real-time notification
         req.app.get("io").to(`user_${counsellorId}`).emit("new_notification", notification);
+
+        // Send Email Notification to counsellor
+        const counsellor = await User.findById(counsellorId);
+        if (counsellor && counsellor.notificationPreferences?.appointmentReminders?.email) {
+            const subject = "New Appointment Request - Student Counselling";
+            const message = `Hello ${counsellor.fullName},\n\nYou have a new appointment request for ${date} at ${time}.\n\nReason: ${reason}\n\nPlease log in to the dashboard to manage your appointments.`;
+            await sendEmail(counsellor.email, subject, message);
+        }
 
 
         res.status(201).json({
@@ -116,6 +125,14 @@ export const updateAppointmentStatus = async (req, res) => {
         // Emit real-time notification
         req.app.get("io").to(`user_${appointment.student}`).emit("new_notification", notification);
 
+        // Send Email Notification to student
+        const student = await User.findById(appointment.student);
+        if (student && student.notificationPreferences?.appointmentReminders?.email) {
+            const subject = "Appointment Status Updated - Student Counselling";
+            const message = `Hello ${student.fullName},\n\n${statusMessageMap[status] || "Your appointment status has been updated."}\n\nAppointment Details:\nDate: ${appointment.date}\nTime: ${appointment.time}\n\nPlease check your dashboard for more details.`;
+            await sendEmail(student.email, subject, message);
+        }
+
 
         res.json({
             success: true,
@@ -174,6 +191,14 @@ export const startMeeting = async (req, res) => {
 
         // Emit real-time notification
         req.app.get("io").to(`user_${appointment.student}`).emit("new_notification", notification);
+
+        // Send Email Notification to student
+        const student = await User.findById(appointment.student);
+        if (student && student.notificationPreferences?.appointmentReminders?.email) {
+            const subject = "Counselling Meeting Started";
+            const message = `Hello ${student.fullName},\n\nYour counsellor has started your ${appointment.type} meeting session. You can join now via your dashboard.\n\nRoom ID: ${appointment.roomId}`;
+            await sendEmail(student.email, subject, message);
+        }
 
 
         res.json({

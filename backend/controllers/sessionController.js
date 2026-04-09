@@ -1,5 +1,7 @@
 import Session from "../models/Session.js";
 import Appointment from "../models/Appointment.js";
+import User from "../models/User.js";
+import sendEmail from "../utils/sendEmail.js";
 
 // CREATE SESSION (Counsellor)
 export const createSession = async (req, res) => {
@@ -47,6 +49,15 @@ export const createSession = async (req, res) => {
         appointment.status = "completed";
         appointment.isStarted = false;
         await appointment.save();
+
+        // Send Email Notification to student if they enabled sessionNotes email
+        const student = await User.findById(appointment.student);
+        if (student && student.notificationPreferences?.sessionNotes?.email) {
+            const counsellor = await User.findById(appointment.counsellor);
+            const subject = "New Session Notes Available - Student Counselling";
+            const text = `Hello ${student.fullName},\n\nYour counsellor, ${counsellor?.fullName || "the counsellor"}, has shared notes and recommendations for your recent session.\n\nPlease log in to your dashboard to view the details.\n\nRecommendations: ${recommendations || "No specific recommendations provided."}`;
+            await sendEmail(student.email, subject, text);
+        }
 
         res.status(201).json({ 
             success: true,

@@ -1,4 +1,6 @@
 import Message from "../models/Message.js";
+import User from "../models/User.js";
+import sendEmail from "../utils/sendEmail.js";
 
 const socketHandler = (io) => {
   io.on("connection", (socket) => {
@@ -42,6 +44,15 @@ const socketHandler = (io) => {
         // Broadcast to the room and specifically to the receiver's catch-all room
         io.to(roomId).emit("receive_message", populatedMessage);
         io.to(`user_${receiverId}`).emit("receive_message", populatedMessage);
+        
+        // Send Email Notification to receiver if they have it enabled
+        const receiver = await User.findById(receiverId);
+        if (receiver && receiver.notificationPreferences?.newMessages?.email) {
+            const sender = await User.findById(senderId);
+            const subject = `New Message from ${sender?.fullName || "your counsellor"}`;
+            const text = `Hello ${receiver.fullName},\n\nYou have received a new message:\n\n"${message || "Attachment sent"}"\n\nPlease log in to your dashboard to reply.`;
+            await sendEmail(receiver.email, subject, text);
+        }
         
         console.log(`Message sent in room ${roomId} from ${senderId} to ${receiverId}`);
       } catch (err) {
