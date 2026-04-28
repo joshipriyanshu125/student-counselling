@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, html) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -11,16 +11,25 @@ const sendEmail = async (to, subject, text) => {
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+
+      from: `"CounselHub" <${process.env.EMAIL_USER}>`,
+
       to,
       subject,
-      text,
+
+
+      text: text || "",
+
+
+      html: html || `<p>${text}</p>`,
     });
-    console.log(`Email sent successfully to ${to}`);
+
+    console.log(`✅ Email sent successfully to ${to}`);
   } catch (error) {
-    console.error("Email sending failed:", error);
-    // We don't throw the error so the main process can continue
+    console.error("❌ Email sending failed:", error);
+
+
   }
 };
 
-export default sendEmail;
+export default sendEmail;
