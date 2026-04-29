@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import http from "http";
@@ -27,8 +28,6 @@ import { fileURLToPath } from "url";
 
 // Socket
 import socketHandler from "./sockets/socket.js";
-
-dotenv.config();
 
 const app = express();
 
@@ -151,7 +150,6 @@ app.use("/api", sessionRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api", feedbackRoutes);
 app.use("/api", counsellorRoutes);
-
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);

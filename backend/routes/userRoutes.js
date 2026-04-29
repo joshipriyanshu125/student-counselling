@@ -83,6 +83,13 @@ router.post(
   upload.single("image"),
   async (req, res) => {
     try {
+      console.log("Upload request received. File:", req.file);
+
+      if (!req.file) {
+        console.error("No file received in request");
+        return res.status(400).json({ message: "No file uploaded or upload failed" });
+      }
+
       const user = await User.findById(req.user._id);
 
       if (!user) {
@@ -100,7 +107,8 @@ router.post(
       });
 
     } catch (error) {
-      res.status(500).json({ message: "Upload failed" });
+      console.error("Upload error details:", error);
+      res.status(500).json({ message: "Upload failed", error: error.message });
     }
   }
 );

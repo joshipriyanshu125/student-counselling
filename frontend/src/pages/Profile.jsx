@@ -16,6 +16,7 @@ function Profile() {
         studentId: "",
         program: "",
         role: "",
+        profilePic: "",
         notificationPreferences: {
             appointmentReminders: { email: true, push: true },
             newMessages: { email: true, push: true },
@@ -45,6 +46,7 @@ function Profile() {
                         studentId: res.data.studentId || "",
                         program: res.data.program || "",
                         role: res.data.role || "student",
+                        profilePic: res.data.profilePic || "",
                         notificationPreferences: res.data.notificationPreferences || {
                             appointmentReminders: { email: true, push: true },
                             newMessages: { email: true, push: true },
@@ -106,6 +108,31 @@ function Profile() {
     }
 
 
+    const handleUpload = async (file) => {
+        if (!file) return;
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            const res = await API.post("/users/upload-profile", formData);
+
+            // update UI instantly
+            setProfile((prev) => ({
+                ...prev,
+                profilePic: res.data.image,
+            }));
+
+            // optional cache
+            localStorage.setItem("profilePic", res.data.image);
+            toast.success("Profile picture updated!");
+
+        } catch (err) {
+            console.error("Upload failed details:", err.response?.data || err.message);
+            toast.error(err.response?.data?.message || "Upload failed");
+        }
+    };
+
+
     return (
 
         <motion.div
@@ -123,8 +150,28 @@ function Profile() {
                     <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
                 </div>
 
-                <div className="relative -mt-20 w-40 h-40 mx-auto rounded-full border-8 border-white bg-slate-50 overflow-hidden shadow-xl flex items-center justify-center text-indigo-100 z-10">
-                    <FaUserCircle className="text-[10rem] text-slate-300 mt-6" />
+                <div className="relative -mt-20 w-40 h-40 mx-auto rounded-full border-8 border-white bg-slate-50 overflow-hidden shadow-xl flex items-center justify-center text-indigo-100 z-10 group/avatar">
+                    <img
+                        src={
+                            profile.profilePic ||
+                            localStorage.getItem("profilePic") ||
+                            "/default-avatar.png"
+                        }
+                        alt="Profile"
+                        className="w-full h-full rounded-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
+                        <label htmlFor="profile-upload" className="cursor-pointer text-white text-xs font-bold uppercase tracking-wider">
+                            Change
+                        </label>
+                    </div>
+                    <input
+                        id="profile-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleUpload(e.target.files[0])}
+                    />
                 </div>
 
                 <div className="py-8 px-4 relative z-10">
