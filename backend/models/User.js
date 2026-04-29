@@ -115,6 +115,12 @@ const userSchema = new mongoose.Schema(
                 email: { type: Boolean, default: false },
                 push: { type: Boolean, default: true }
             }
+        },
+
+        // ✅ ONLY ADDITION (nothing else touched)
+        profilePic: {
+            type: String,
+            default: "",
         }
     },
     {

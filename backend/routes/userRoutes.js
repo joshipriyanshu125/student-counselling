@@ -2,6 +2,9 @@ import express from "express";
 import User from "../models/User.js";
 import { protect } from "../middleware/authMiddleware.js";
 
+// ✅ NEW IMPORT (STEP 7)
+import upload from "../middleware/upload.js";
+
 const router = express.Router();
 
 
@@ -68,5 +71,39 @@ router.put("/profile", protect, async (req, res) => {
   }
 
 });
+
+
+/* -----------------------------------------
+   ✅ STEP 7: UPLOAD PROFILE IMAGE (ADDED ONLY)
+----------------------------------------- */
+
+router.post(
+  "/upload-profile",
+  protect,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Save Cloudinary image URL
+      user.profilePic = req.file.path;
+
+      await user.save();
+
+      res.json({
+        success: true,
+        image: req.file.path,
+      });
+
+    } catch (error) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  }
+);
+
 
 export default router;
