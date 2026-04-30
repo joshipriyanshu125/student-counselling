@@ -29,6 +29,7 @@ import { File, X, Download } from "lucide-react";
 
 
 const SOCKET_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000";
 
 const Messages = () => {
   const location = useLocation();
@@ -212,11 +213,10 @@ const Messages = () => {
       const formData = new FormData();
       formData.append("file", selectedFile);
       try {
-        const res = await API.post("/upload", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const res = await API.post("/upload", formData);
         fileData = res.data;
       } catch (err) {
+        console.error("Upload error:", err);
         toast.error("Failed to upload file");
         setIsUploading(false);
         return;
@@ -246,8 +246,8 @@ const Messages = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
         return;
       }
       setSelectedFile(file);
@@ -429,10 +429,10 @@ const Messages = () => {
                             <div className="mb-2">
                               {msg.fileType?.startsWith("image/") ? (
                                 <img 
-                                  src={`http://localhost:5000${msg.fileUrl}`} 
+                                  src={msg.fileUrl?.startsWith("http") ? msg.fileUrl : `${API_URL}${msg.fileUrl}`} 
                                   alt="attachment" 
                                   className="max-w-full rounded-2xl mb-2 cursor-pointer hover:opacity-90 transition-opacity" 
-                                  onClick={() => window.open(`http://localhost:5000${msg.fileUrl}`, "_blank")}
+                                  onClick={() => window.open(msg.fileUrl?.startsWith("http") ? msg.fileUrl : `${API_URL}${msg.fileUrl}`, "_blank")}
                                 />
                               ) : (
                                 <div className={`flex items-center gap-3 p-3 rounded-2xl ${isMine ? "bg-indigo-500" : "bg-white"} border ${isMine ? "border-indigo-400" : "border-slate-200"}`}>
@@ -443,7 +443,7 @@ const Messages = () => {
                                     <p className={`text-xs font-bold truncate ${isMine ? "text-white" : "text-slate-800"}`}>Attachment</p>
                                     <p className={`text-[10px] ${isMine ? "text-indigo-100" : "text-slate-400"}`}>Click to download</p>
                                   </div>
-                                  <a href={`http://localhost:5000${msg.fileUrl}`} target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full hover:bg-black/10 transition-colors`}>
+                                  <a href={msg.fileUrl?.startsWith("http") ? msg.fileUrl : `${API_URL}${msg.fileUrl}`} target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full hover:bg-black/10 transition-colors`}>
                                     <Download size={16} className={isMine ? "text-white" : "text-slate-600"} />
                                   </a>
                                 </div>

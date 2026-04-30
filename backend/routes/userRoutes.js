@@ -80,14 +80,22 @@ router.put("/profile", protect, async (req, res) => {
 router.post(
   "/upload-profile",
   protect,
-  upload.single("image"),
+  (req, res, next) => {
+    upload.single("image")(req, res, (err) => {
+      if (err) {
+        console.error("Multer/Cloudinary Error:", err);
+        return res.status(400).json({ message: "Upload failed at storage", error: err.message });
+      }
+      next();
+    });
+  },
   async (req, res) => {
     try {
-      console.log("Upload request received. File:", req.file);
+      console.log("File uploaded to Cloudinary. Info:", req.file);
 
       if (!req.file) {
-        console.error("No file received in request");
-        return res.status(400).json({ message: "No file uploaded or upload failed" });
+        console.error("No file received after Cloudinary upload");
+        return res.status(400).json({ message: "No file uploaded" });
       }
 
       const user = await User.findById(req.user._id);
@@ -96,7 +104,7 @@ router.post(
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Save Cloudinary image URL
+      // Save Cloudinary image URL (path is the URL for Cloudinary storage)
       user.profilePic = req.file.path;
 
       await user.save();
@@ -107,8 +115,8 @@ router.post(
       });
 
     } catch (error) {
-      console.error("Upload error details:", error);
-      res.status(500).json({ message: "Upload failed", error: error.message });
+      console.error("Database save error after upload:", error);
+      res.status(500).json({ message: "Failed to save profile picture to database", error: error.message });
     }
   }
 );
