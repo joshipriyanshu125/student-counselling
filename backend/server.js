@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config();
+const result = dotenv.config();
+console.log("Dotenv Config Result:", result.error ? "ERROR" : "SUCCESS");
+console.log("Check CLOUD_API_KEY from server.js:", process.env.CLOUD_API_KEY ? "FOUND" : "MISSING");
+
 import express from "express";
 import cors from "cors";
 import http from "http";
