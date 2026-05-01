@@ -25,6 +25,7 @@ import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import moodRoutes from "./routes/moodRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -157,6 +158,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/moods", moodRoutes);
 
 
 

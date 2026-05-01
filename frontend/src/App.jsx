@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Counsellors from "./pages/Counsellors";
 import Messages from "./pages/Messages";
 import Settings from "./pages/Settings";
+import MoodTracker from "./pages/MoodTracker";
 
 
 /* ✅ CALL PAGE */
@@ -206,6 +207,17 @@ function App() {
             <MainLayout>
               <PageTransition>
                 <Settings />
+              </PageTransition>
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/mood-tracker"
+          element={
+            <MainLayout>
+              <PageTransition>
+                <MoodTracker />
               </PageTransition>
             </MainLayout>
           }

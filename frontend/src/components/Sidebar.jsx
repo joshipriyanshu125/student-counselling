@@ -13,7 +13,8 @@ import {
     GraduationCap,
     CheckSquare,
     Users,
-    Settings as SettingsIcon
+    Settings as SettingsIcon,
+    HeartPulse
 } from "lucide-react";
 
 function Sidebar() {
@@ -49,6 +50,7 @@ function Sidebar() {
         { name: "Appointments", path: "/my-appointments", icon: <Calendar className="w-5 h-5" /> },
         { name: "Book Appointment", path: "/book-appointment", icon: <CalendarPlus className="w-5 h-5" /> },
         { name: "Sessions", path: "/sessions", icon: <History className="w-5 h-5" /> },
+        { name: "Mood Tracker", path: "/mood-tracker", icon: <HeartPulse className="w-5 h-5" /> },
         { name: "Feedback", path: "/feedback", icon: <Star className="w-5 h-5" /> },
         { name: "Notifications", path: "/notifications", icon: <Bell className="w-5 h-5" /> },
     ];

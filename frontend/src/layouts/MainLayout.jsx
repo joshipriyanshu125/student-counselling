@@ -15,7 +15,8 @@ import {
     User,
     GraduationCap,
     Users,
-    Settings
+    Settings,
+    HeartPulse
 } from "lucide-react"
 
 import NotificationDropdown from "../components/NotificationDropdown"
@@ -43,6 +44,7 @@ function MainLayout({ children }) {
         { name: "Appointments", path: "/my-appointments", icon: Calendar },
         { name: "Book Appointment", path: "/book-appointment", icon: BookOpen },
         { name: "Sessions", path: "/sessions", icon: BookOpen },
+        { name: "Mood Tracker", path: "/mood-tracker", icon: HeartPulse },
         { name: "Feedback", path: "/feedback", icon: Star },
         { name: "Notifications", path: "/notifications", icon: Bell },
     ]
