@@ -4,7 +4,7 @@ import User from "../models/User.js";
 export const getCounsellors = async (req, res) => {
     try {
         const counsellors = await User.find({ role: "counsellor", isApproved: true })
-            .select("fullName email specialization rating phone yearsOfExperience bio location tags ratingCount availability");
+            .select("fullName email specialization rating phone yearsOfExperience bio location tags ratingCount availability profilePic");
 
         res.json({
             success: true,

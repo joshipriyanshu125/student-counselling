@@ -9,8 +9,8 @@ export const getMessages = async (req, res) => {
     const { roomId } = req.params;
     const messages = await Message.find({ roomId })
       .sort({ createdAt: 1 })
-      .populate("senderId", "fullName email role")
-      .populate("receiverId", "fullName email role");
+      .populate("senderId", "fullName email role profilePic")
+      .populate("receiverId", "fullName email role profilePic");
 
     res.status(200).json({
       success: true,
@@ -50,7 +50,7 @@ export const getConversations = async (req, res) => {
       if (!conversationPartners.has(partnerId.toString())) {
         conversationPartners.add(partnerId.toString());
         
-        const partner = await User.findById(partnerId).select("fullName email role specialization bio");
+        const partner = await User.findById(partnerId).select("fullName email role specialization bio profilePic");
         
         // Count unread messages for this specific room where the user is the receiver
         const unreadCount = await Message.countDocuments({

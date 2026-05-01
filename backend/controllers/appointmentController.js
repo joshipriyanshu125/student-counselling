@@ -58,7 +58,7 @@ export const getMyAppointments = async (req, res) => {
     try {
         const studentId = req.user.id;
         const appointments = await Appointment.find({ student: studentId })
-            .populate("counsellor", "fullName email specialization")
+            .populate("counsellor", "fullName email specialization profilePic")
             .sort({ date: 1 });
 
         res.json({
@@ -76,7 +76,7 @@ export const getCounsellorAppointments = async (req, res) => {
     try {
         const counsellorId = req.user.id;
         const appointments = await Appointment.find({ counsellor: counsellorId })
-            .populate("student", "fullName email studentId program phone")
+            .populate("student", "fullName email studentId program phone profilePic")
             .sort({ date: 1 });
 
         res.json({
@@ -149,7 +149,7 @@ export const updateAppointmentStatus = async (req, res) => {
 export const getCounsellors = async (req, res) => {
     try {
         const counsellors = await User.find({ role: "counsellor", isApproved: true })
-            .select("fullName email specialization rating phone experience about");
+            .select("fullName email specialization rating phone experience about profilePic");
 
         res.json({
             success: true,

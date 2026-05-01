@@ -377,8 +377,12 @@ const Dashboard = () => {
                                 upcomingAppointments.slice(0, 3).map((apt) => (
                                     <div key={apt._id} className={`flex flex-col p-6 rounded-[2rem] bg-white border border-slate-100 border-t-4 ${getBorderColor(apt.counsellor?.specialization)} shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-500 group relative`}>
                                         <div className="flex items-start gap-4 mb-6">
-                                            <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-100">
-                                                <User size={28} strokeWidth={2.5} />
+                                            <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-100 overflow-hidden">
+                                                {apt.counsellor?.profilePic ? (
+                                                    <img src={apt.counsellor.profilePic.startsWith('http') ? apt.counsellor.profilePic : `http://localhost:5000${apt.counsellor.profilePic}`} alt={apt.counsellor.fullName} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User size={28} strokeWidth={2.5} />
+                                                )}
                                             </div>
                                             <div className="flex-grow min-w-0">
                                                 <h4 className="font-extrabold text-xl text-slate-900 tracking-tight truncate">{apt.counsellor?.fullName || "Counsellor"}</h4>

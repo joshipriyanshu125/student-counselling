@@ -44,8 +44,16 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook, onMes
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Left: Avatar */}
                 <div className="shrink-0">
-                    <div className={`w-20 h-20 md:w-24 md:h-24 rounded-[2rem] ${avatarColor} flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-indigo-100 group-hover:scale-105 transition-transform duration-500`}>
-                        {getInitials(counsellor.fullName || "C")}
+                    <div className={`w-20 h-20 md:w-24 md:h-24 rounded-[2rem] ${avatarColor} flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-indigo-100 group-hover:scale-105 transition-transform duration-500 overflow-hidden`}>
+                        {counsellor.profilePic ? (
+                            <img 
+                                src={counsellor.profilePic.startsWith('http') ? counsellor.profilePic : `http://localhost:5000${counsellor.profilePic}`} 
+                                alt={counsellor.fullName} 
+                                className="w-full h-full object-cover" 
+                            />
+                        ) : (
+                            getInitials(counsellor.fullName || "C")
+                        )}
                     </div>
                 </div>
 

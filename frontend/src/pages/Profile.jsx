@@ -153,9 +153,11 @@ function Profile() {
                 <div className="relative -mt-20 w-40 h-40 mx-auto rounded-full border-8 border-white bg-slate-50 overflow-hidden shadow-xl flex items-center justify-center text-indigo-100 z-10 group/avatar">
                     <img
                         src={
-                            profile.profilePic ||
-                            localStorage.getItem("profilePic") ||
-                            "/default-avatar.png"
+                            profile.profilePic
+                                ? (profile.profilePic.startsWith('http') ? profile.profilePic : `http://localhost:5000${profile.profilePic}`)
+                                : (localStorage.getItem("profilePic") 
+                                    ? (localStorage.getItem("profilePic").startsWith('http') ? localStorage.getItem("profilePic") : `http://localhost:5000${localStorage.getItem("profilePic")}`)
+                                    : "/default-avatar.png")
                         }
                         alt="Profile"
                         className="w-full h-full rounded-full object-cover"

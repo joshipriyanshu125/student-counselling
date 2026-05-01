@@ -309,10 +309,18 @@ const Messages = () => {
                 }`}
               >
                 <div className="relative">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden ${
                     activeChat?.roomId === conv.roomId ? 'bg-indigo-600' : 'bg-slate-300'
                   }`}>
-                    {conv.partner.fullName.charAt(0)}
+                    {conv.partner.profilePic ? (
+                      <img 
+                        src={conv.partner.profilePic.startsWith('http') ? conv.partner.profilePic : `${API_URL}${conv.partner.profilePic}`} 
+                        alt={conv.partner.fullName} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      conv.partner.fullName.charAt(0)
+                    )}
                   </div>
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                   {conv.unreadCount > 0 && activeChat?.roomId !== conv.roomId && (
@@ -382,8 +390,16 @@ const Messages = () => {
                   <ArrowLeft size={20} className="text-slate-600" />
                 </button>
                 <div className="relative">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-lg">
-                    {activeChat?.partner?.fullName?.charAt(0)}
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-lg overflow-hidden">
+                    {activeChat?.partner?.profilePic ? (
+                      <img 
+                        src={activeChat.partner.profilePic.startsWith('http') ? activeChat.partner.profilePic : `${API_URL}${activeChat.partner.profilePic}`} 
+                        alt={activeChat.partner.fullName} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      activeChat?.partner?.fullName?.charAt(0)
+                    )}
                   </div>
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                 </div>

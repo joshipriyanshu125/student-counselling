@@ -117,8 +117,12 @@ const BookAppointment = () => {
                 }`}
         >
 
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600">
-                👨‍⚕️
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 overflow-hidden">
+                {counsellor.profilePic ? (
+                    <img src={counsellor.profilePic.startsWith('http') ? counsellor.profilePic : `http://localhost:5000${counsellor.profilePic}`} alt={counsellor.fullName} className="w-full h-full object-cover" />
+                ) : (
+                    "👨‍⚕️"
+                )}
             </div>
 
             <div>

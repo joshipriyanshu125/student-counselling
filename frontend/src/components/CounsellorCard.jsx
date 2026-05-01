@@ -21,11 +21,17 @@ const CounsellorCard = ({ counsellor, isSelected, onSelect }) => {
                 {/* Avatar with decorative ring */}
                 <div className="relative mb-4">
                     <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <img
-                        src={counsellor.image}
-                        alt={counsellor.name}
-                        className={`relative w-24 h-24 rounded-full object-cover border-4 transition-colors duration-300 ${isSelected ? 'border-indigo-50' : 'border-white'}`}
-                    />
+                    {counsellor.profilePic ? (
+                        <img
+                            src={counsellor.profilePic.startsWith('http') ? counsellor.profilePic : `http://localhost:5000${counsellor.profilePic}`}
+                            alt={counsellor.fullName || counsellor.name}
+                            className={`relative w-24 h-24 rounded-full object-cover border-4 transition-colors duration-300 ${isSelected ? 'border-indigo-50' : 'border-white'}`}
+                        />
+                    ) : (
+                        <div className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center text-2xl font-bold bg-indigo-50 text-indigo-600 ${isSelected ? 'border-indigo-50' : 'border-white'}`}>
+                            {(counsellor.fullName || counsellor.name || "C").charAt(0)}
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-1.5 w-full">
