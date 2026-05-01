@@ -117,10 +117,22 @@ const userSchema = new mongoose.Schema(
             }
         },
 
-        // ✅ ONLY ADDITION (nothing else touched)
         profilePic: {
             type: String,
             default: "",
+        },
+        settings: {
+            language: { type: String, default: "English" },
+            timezone: { type: String, default: "(GMT+05:30) Mumbai, Kolkata" },
+            dateFormat: { type: String, default: "DD/MM/YYYY" },
+            timeFormat: { type: String, default: "12-hour" },
+            accessibility: {
+                reduceMotion: { type: Boolean, default: false },
+                highContrast: { type: Boolean, default: false },
+                screenReader: { type: Boolean, default: false },
+                keyboardNav: { type: Boolean, default: false },
+                alwaysShowCaptions: { type: Boolean, default: false }
+            }
         }
     },
     {

@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import Counsellors from "./pages/Counsellors";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
 
 
 /* ✅ CALL PAGE */
@@ -194,6 +195,17 @@ function App() {
             <MainLayout>
               <PageTransition>
                 <Profile />
+              </PageTransition>
+            </MainLayout>
+          }
+        />
+        
+        <Route
+          path="/settings"
+          element={
+            <MainLayout>
+              <PageTransition>
+                <Settings />
               </PageTransition>
             </MainLayout>
           }

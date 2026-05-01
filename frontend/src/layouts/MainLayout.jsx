@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import API from "../api/api";
 import { io } from "socket.io-client";
+import toast from "react-hot-toast";
 
 
 
@@ -13,7 +14,8 @@ import {
     Star,
     User,
     GraduationCap,
-    Users
+    Users,
+    Settings
 } from "lucide-react"
 
 import NotificationDropdown from "../components/NotificationDropdown"
@@ -117,6 +119,7 @@ function MainLayout({ children }) {
 
     const accountMenu = [
         { name: "Profile", path: "/profile", icon: User },
+        { name: "Settings", path: "/settings", icon: Settings },
     ]
 
     return (

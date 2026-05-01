@@ -12,7 +12,8 @@ import {
     User,
     GraduationCap,
     CheckSquare,
-    Users
+    Users,
+    Settings as SettingsIcon
 } from "lucide-react";
 
 function Sidebar() {
@@ -59,6 +60,7 @@ function Sidebar() {
 
     const accountLinks = [
         { name: "Profile", path: "/profile", icon: <User className="w-5 h-5" /> },
+        { name: "Settings", path: "/settings", icon: <SettingsIcon className="w-5 h-5" /> },
     ];
 
     // choose menu based on role
