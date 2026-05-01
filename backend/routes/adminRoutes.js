@@ -1,7 +1,12 @@
 import express from "express";
 import User from "../models/User.js";
+import { protect, allowAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+// Apply protection to all routes in this router
+router.use(protect);
+router.use(allowAdmin);
 
 // get pending counsellors
 router.get("/pending-counsellors", async (req, res) => {

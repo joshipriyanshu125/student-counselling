@@ -23,12 +23,18 @@ const AdminDashboard = () => {
         try {
             setIsLoading(true);
             const res = await API.get("/admin/pending-counsellors");
-            if (res.data?.success) {
+            
+            // Explicitly check for success and data being an array
+            if (res.data?.success && Array.isArray(res.data.data)) {
                 setCounsellors(res.data.data);
+            } else {
+                // If the response is successful but data is missing, just set empty array
+                setCounsellors([]);
             }
         } catch (error) {
             console.error("Failed to load pending counsellors", error);
-            toast.error("Failed to load pending requests");
+            const errorMsg = error.response?.data?.message || "Failed to load pending requests";
+            toast.error(errorMsg);
         } finally {
             setIsLoading(false);
         }
