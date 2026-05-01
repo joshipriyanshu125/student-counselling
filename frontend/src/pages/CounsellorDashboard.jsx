@@ -23,84 +23,86 @@ const CounsellorDashboard = () => {
     const [typeData, setTypeData] = useState([])
     const [weeklyData, setWeeklyData] = useState([])
     const [trendView, setTrendView] = useState("monthly")
-    const [userName, setUserName] = useState("")
+    const [isApproved, setIsApproved] = useState(true)
 
     useEffect(() => {
 
         const fetchData = async () => {
             try {
-                // Fetch Profile for name
+                // Fetch Profile for name and approval status
                 const profileRes = await API.get("/users/me")
-                if (profileRes.data?.fullName) {
-                    setUserName(profileRes.data.fullName.split(" ")[0])
+                if (profileRes.data) {
+                    setUserName(profileRes.data.fullName?.split(" ")[0] || "")
+                    setIsApproved(profileRes.data.isApproved)
                 }
 
-                const res = await API.get("/appointments/counsellor")
-                if (res.data?.success) {
-                    const apts = res.data.data
-                    setAppointments(apts)
-                    setStats({
-                        total: apts.length,
-                        pending: apts.filter(a => a.status === "pending").length,
-                        completed: apts.filter(a => a.status === "completed").length,
-                        rejected: apts.filter(a => a.status === "rejected").length,
-                    })
+                if (profileRes.data?.isApproved) {
+                    const res = await API.get("/appointments/counsellor")
+                    if (res.data?.success) {
+                        const apts = res.data.data
+                        setAppointments(apts)
+                        setStats({
+                            total: apts.length,
+                            pending: apts.filter(a => a.status === "pending").length,
+                            completed: apts.filter(a => a.status === "completed").length,
+                            rejected: apts.filter(a => a.status === "rejected").length,
+                        })
 
-                    // Process real monthly trend data
-                    const months = [];
-                    const now = new Date();
-                    for (let i = 6; i >= 0; i--) {
-                        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                        months.push({
-                            name: d.toLocaleString('default', { month: 'short' }),
-                            monthKey: `${d.getFullYear()}-${d.getMonth()}`,
-                            Scheduled: 0,
-                            Completed: 0
-                        });
-                    }
-
-                    apts.forEach(apt => {
-                        const date = new Date(apt.date);
-                        const key = `${date.getFullYear()}-${date.getMonth()}`;
-                        const m = months.find(item => item.monthKey === key);
-                        if (m) {
-                            m.Scheduled++;
-                            if (apt.status === 'completed') m.Completed++;
+                        // Process real monthly trend data
+                        const months = [];
+                        const now = new Date();
+                        for (let i = 6; i >= 0; i--) {
+                            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                            months.push({
+                                name: d.toLocaleString('default', { month: 'short' }),
+                                monthKey: `${d.getFullYear()}-${d.getMonth()}`,
+                                Scheduled: 0,
+                                Completed: 0
+                            });
                         }
-                    });
-                    setTrendsData(months);
 
-                    // Process session types
-                    const reasons = apts.reduce((acc, apt) => {
-                        const reason = apt.reason || "General Counselling";
-                        acc[reason] = (acc[reason] || 0) + 1;
-                        return acc;
-                    }, {})
-                    setTypeData(Object.entries(reasons).map(([name, value]) => ({ name, value })))
-
-                    // Process real weekly data
-                    const days = [];
-                    for (let i = 6; i >= 0; i--) {
-                        const d = new Date();
-                        d.setDate(now.getDate() - i);
-                        days.push({
-                            name: d.toLocaleString('default', { weekday: 'short' }),
-                            dateKey: d.toDateString(),
-                            Scheduled: 0,
-                            Completed: 0
+                        apts.forEach(apt => {
+                            const date = new Date(apt.date);
+                            const key = `${date.getFullYear()}-${date.getMonth()}`;
+                            const m = months.find(item => item.monthKey === key);
+                            if (m) {
+                                m.Scheduled++;
+                                if (apt.status === 'completed') m.Completed++;
+                            }
                         });
-                    }
+                        setTrendsData(months);
 
-                    apts.forEach(apt => {
-                        const date = new Date(apt.date).toDateString();
-                        const d = days.find(item => item.dateKey === date);
-                        if (d) {
-                            d.Scheduled++;
-                            if (apt.status === 'completed') d.Completed++;
+                        // Process session types
+                        const reasons = apts.reduce((acc, apt) => {
+                            const reason = apt.reason || "General Counselling";
+                            acc[reason] = (acc[reason] || 0) + 1;
+                            return acc;
+                        }, {})
+                        setTypeData(Object.entries(reasons).map(([name, value]) => ({ name, value })))
+
+                        // Process real weekly data
+                        const days = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const d = new Date();
+                            d.setDate(now.getDate() - i);
+                            days.push({
+                                name: d.toLocaleString('default', { weekday: 'short' }),
+                                dateKey: d.toDateString(),
+                                Scheduled: 0,
+                                Completed: 0
+                            });
                         }
-                    });
-                    setWeeklyData(days);
 
+                        apts.forEach(apt => {
+                            const date = new Date(apt.date).toDateString();
+                            const d = days.find(item => item.dateKey === date);
+                            if (d) {
+                                d.Scheduled++;
+                                if (apt.status === 'completed') d.Completed++;
+                            }
+                        });
+                        setWeeklyData(days);
+                    }
                 }
             } catch (err) {
                 console.error("Dashboard fetch error:", err)
@@ -121,6 +123,27 @@ const CounsellorDashboard = () => {
         if (status === "approved") return "bg-emerald-100 text-emerald-700"
         if (status === "rejected") return "bg-red-100 text-red-600"
         return "bg-yellow-100 text-yellow-700"
+    }
+
+    if (!isApproved && !isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+                <div className="bg-amber-50 p-8 rounded-[2.5rem] border-2 border-dashed border-amber-200 max-w-2xl">
+                    <div className="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-amber-600">
+                        <Clock size={40} />
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-800 mb-4 tracking-tight">Registration Under Review</h2>
+                    <p className="text-slate-500 font-bold text-lg leading-relaxed mb-8">
+                        Welcome to CounselHub! Your registration is currently being reviewed by our administration team. 
+                        You'll be able to manage appointments and students once your profile is approved.
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-amber-600 font-black uppercase tracking-widest text-xs">
+                        <CheckCircle size={16} />
+                        Estimated time: 24-48 hours
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (

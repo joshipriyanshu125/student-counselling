@@ -58,6 +58,10 @@ function MainLayout({ children }) {
         { name: "Notifications", path: "/notifications", icon: Bell },
     ]
 
+    const adminMenu = [
+        { name: "Admin Dashboard", path: "/admin", icon: LayoutGrid },
+        { name: "Settings", path: "/settings", icon: Settings },
+    ]
 
 
     useEffect(() => {
@@ -116,7 +120,10 @@ function MainLayout({ children }) {
     }, [])
 
 
-    const mainMenu = isCounsellor ? counsellorMenu : studentMenu
+    const role = localStorage.getItem("role")
+    let mainMenu = studentMenu;
+    if (role === "counsellor") mainMenu = counsellorMenu;
+    if (role === "admin") mainMenu = adminMenu;
 
 
     const accountMenu = [

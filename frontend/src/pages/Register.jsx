@@ -92,7 +92,7 @@ const Register = () => {
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                            className="w-full bg-slate-900/80 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@ const Register = () => {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                            className="w-full bg-slate-900/80 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -128,7 +128,7 @@ const Register = () => {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                            className="w-full bg-slate-900/80 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -141,10 +141,11 @@ const Register = () => {
                                     <select
                                         value={role}
                                         onChange={(e) => setRole(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                                        className="w-full bg-slate-900 border border-white/20 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none cursor-pointer"
                                     >
-                                        <option value="student">Student</option>
-                                        <option value="counsellor">Counsellor</option>
+                                        <option value="student" className="bg-slate-900 text-white">Student</option>
+                                        <option value="counsellor" className="bg-slate-900 text-white">Counsellor</option>
+                                        <option value="admin" className="bg-slate-900 text-white">Admin</option>
                                     </select>
                                 </div>
 

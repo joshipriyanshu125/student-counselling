@@ -27,6 +27,8 @@ const Login = () => {
             const role = res.data.user.role;
             if (role === "counsellor") {
                 navigate("/counsellor-dashboard");
+            } else if (role === "admin") {
+                navigate("/admin");
             } else {
                 navigate("/dashboard");
             }
@@ -91,7 +93,7 @@ const Login = () => {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full bg-slate-900/80 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -108,7 +110,7 @@ const Login = () => {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full bg-slate-900/80 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
