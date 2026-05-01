@@ -23,6 +23,7 @@ const CounsellorDashboard = () => {
     const [typeData, setTypeData] = useState([])
     const [weeklyData, setWeeklyData] = useState([])
     const [trendView, setTrendView] = useState("monthly")
+    const [userName, setUserName] = useState("")
     const [isApproved, setIsApproved] = useState(true)
 
     useEffect(() => {
