@@ -1,7 +1,5 @@
 import dotenv from "dotenv";
-const result = dotenv.config();
-console.log("Dotenv Config Result:", result.error ? "ERROR" : "SUCCESS");
-console.log("Check CLOUD_API_KEY from server.js:", process.env.CLOUD_API_KEY ? "FOUND" : "MISSING");
+dotenv.config();
 
 import express from "express";
 import cors from "cors";
@@ -26,9 +24,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
+
 import path from "path";
 import { fileURLToPath } from "url";
-
 
 // Socket
 import socketHandler from "./sockets/socket.js";
@@ -38,30 +36,24 @@ const app = express();
 // Connect Database
 connectDB();
 
-// Enable CORS
+/* ================= FIXED CORS ================= */
+
 app.use(
     cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-
-            if (/^http:\/\/localhost:517\d{1,2}$/.test(origin)) {
-                return callback(null, true);
-            }
-
-            return callback(new Error("Not allowed by CORS"));
-        },
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        origin: true, // allow all origins (safe for now)
         credentials: true,
     })
 );
 
+/* ============================================= */
+
 // Body Parser
 app.use(express.json());
 
+// Static uploads
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 
 /* ================= PROFILE ROUTES ================= */
 
@@ -160,8 +152,6 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/moods", moodRoutes);
 
-
-
 // Test Route
 app.get("/", (req, res) => {
     res.send("API is running...");
@@ -184,16 +174,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: true,
+        origin: "*",
         credentials: true,
     },
 });
 
-// Attach io to app so it can be used in controllers
 app.set("io", io);
 
 socketHandler(io);
-
 
 /* ================= SERVER START ================= */
 
