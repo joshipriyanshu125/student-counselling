@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaIdCard, FaCalendarAlt, FaComments, FaFileAlt, FaExclamationTriangle, FaBell, FaSave } from "react-icons/fa"
+import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaIdCard, FaCalendarAlt, FaComments, FaFileAlt, FaExclamationTriangle, FaBell, FaSave, FaBriefcase } from "react-icons/fa"
 import Button from "../components/Button"
 import InputField from "../components/InputField"
 import Toggle from "../components/Toggle"
@@ -23,7 +23,11 @@ function Profile() {
             sessionNotes: { email: true, push: false },
             systemAlerts: { email: true, push: true },
             feedbackRequests: { email: false, push: true }
-        }
+        },
+        specialization: "",
+        bio: "",
+        location: "",
+        yearsOfExperience: 0
     })
 
     const [editMode, setEditMode] = useState(false)
@@ -53,7 +57,11 @@ function Profile() {
                             sessionNotes: { email: true, push: false },
                             systemAlerts: { email: true, push: true },
                             feedbackRequests: { email: false, push: true }
-                        }
+                        },
+                        specialization: res.data.specialization || "",
+                        bio: res.data.bio || "",
+                        location: res.data.location || "",
+                        yearsOfExperience: res.data.yearsOfExperience || 0
                     })
                 }
 
@@ -251,6 +259,45 @@ function Profile() {
                         icon={FaIdCard}
                         disabled={!editMode}
                     />
+
+                    {profile.role === "counsellor" && (
+                        <>
+                            <InputField
+                                label="Specialization"
+                                value={profile.specialization}
+                                onChange={(e) => handleChange("specialization", e.target.value)}
+                                icon={FaBriefcase}
+                                disabled={!editMode}
+                                placeholder="e.g. Mental Health, Academic Guidance"
+                            />
+                            <InputField
+                                label="Years of Experience"
+                                type="number"
+                                value={profile.yearsOfExperience}
+                                onChange={(e) => handleChange("yearsOfExperience", e.target.value)}
+                                icon={FaCalendarAlt}
+                                disabled={!editMode}
+                            />
+                            <InputField
+                                label="Location"
+                                value={profile.location}
+                                onChange={(e) => handleChange("location", e.target.value)}
+                                icon={FaMapMarkerAlt}
+                                disabled={!editMode}
+                            />
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-slate-500 mb-2 ml-1">Professional Bio</label>
+                                <textarea
+                                    className={`w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-4 focus:ring-indigo-100 outline-none transition-all ${!editMode ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    value={profile.bio}
+                                    onChange={(e) => handleChange("bio", e.target.value)}
+                                    disabled={!editMode}
+                                    rows={4}
+                                    placeholder="Tell students about your background and expertise..."
+                                />
+                            </div>
+                        </>
+                    )}
 
                 </div>
 

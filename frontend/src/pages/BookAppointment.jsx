@@ -166,18 +166,21 @@ const BookAppointment = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-
-                    {counsellors.map((counsellor) => (
-
-                        <SimpleCounsellorCard
-                            key={counsellor._id}
-                            counsellor={counsellor}
-                            isSelected={selectedCounsellor?._id === counsellor._id}
-                            onSelect={setSelectedCounsellor}
-                        />
-
-                    ))}
-
+                    {counsellors.length > 0 ? (
+                        counsellors.map((counsellor) => (
+                            <SimpleCounsellorCard
+                                key={counsellor._id}
+                                counsellor={counsellor}
+                                isSelected={selectedCounsellor?._id === counsellor._id}
+                                onSelect={setSelectedCounsellor}
+                            />
+                        ))
+                    ) : (
+                        <div className="col-span-2 py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
+                            <p className="text-slate-500 font-bold">No approved counsellors available</p>
+                            <p className="text-slate-400 text-sm">Please check back later or contact admin.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

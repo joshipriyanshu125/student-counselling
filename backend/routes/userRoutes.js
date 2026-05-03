@@ -52,6 +52,10 @@ router.put("/profile", protect, async (req, res) => {
     user.phone = req.body.phone || user.phone;
     user.studentId = req.body.studentId || user.studentId;
     user.program = req.body.program || user.program;
+    user.specialization = req.body.specialization || user.specialization;
+    user.bio = req.body.bio || user.bio;
+    user.location = req.body.location || user.location;
+    user.yearsOfExperience = req.body.yearsOfExperience !== undefined ? req.body.yearsOfExperience : user.yearsOfExperience;
 
     if (req.body.notificationPreferences) {
       user.notificationPreferences = {
