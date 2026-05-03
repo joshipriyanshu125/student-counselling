@@ -25,6 +25,10 @@ const CounsellorDashboard = () => {
     const [trendView, setTrendView] = useState("monthly")
     const [userName, setUserName] = useState("")
     const [isApproved, setIsApproved] = useState(true)
+    const [specialization, setSpecialization] = useState("")
+    const [bio, setBio] = useState("")
+    const [isSetupMissing, setIsSetupMissing] = useState(false)
+    const [isUpdatingSetup, setIsUpdatingSetup] = useState(false)
 
     useEffect(() => {
 
@@ -35,6 +39,9 @@ const CounsellorDashboard = () => {
                 if (profileRes.data) {
                     setUserName(profileRes.data.fullName?.split(" ")[0] || "")
                     setIsApproved(profileRes.data.isApproved)
+                    setSpecialization(profileRes.data.specialization || "")
+                    setBio(profileRes.data.bio || "")
+                    setIsSetupMissing(!profileRes.data.specialization || !profileRes.data.bio)
                 }
 
                 if (profileRes.data?.isApproved) {
@@ -126,6 +133,23 @@ const CounsellorDashboard = () => {
         return "bg-yellow-100 text-yellow-700"
     }
 
+    const handleQuickSetup = async () => {
+        if (!specialization) {
+            toast.error("Please enter your specialization")
+            return
+        }
+        setIsUpdatingSetup(true)
+        try {
+            await API.put("/users/profile", { specialization, bio })
+            toast.success("Profile updated successfully!")
+            setIsSetupMissing(false)
+        } catch (err) {
+            toast.error("Failed to update profile")
+        } finally {
+            setIsUpdatingSetup(false)
+        }
+    }
+
     if (!isApproved && !isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
@@ -151,14 +175,76 @@ const CounsellorDashboard = () => {
         <div className="pb-12">
 
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-                    Welcome, {userName || "Counsellor"} <span className="text-4xl">🩺</span>
-                </h1>
-                <p className="mt-2 text-slate-500 text-base">
-                    Overview of your appointments and student activity
-                </p>
+            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+                        Welcome, {userName || "Counsellor"} <span className="text-4xl">🩺</span>
+                    </h1>
+                    <p className="mt-2 text-slate-500 text-base font-medium">
+                        Overview of your appointments and student activity
+                    </p>
+                </div>
+                {specialization && (
+                    <div className="bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 flex items-center gap-2">
+                        <Star className="w-4 h-4 text-indigo-600 fill-indigo-600" />
+                        <span className="text-sm font-bold text-indigo-700 uppercase tracking-wider">{specialization}</span>
+                    </div>
+                )}
             </div>
+
+            {/* Quick Setup Card - Only shows if specialization is missing */}
+            {isSetupMissing && !isLoading && (
+                <div className="mb-10 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-indigo-200 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                            <div className="flex-1 space-y-4">
+                                <h2 className="text-2xl md:text-3xl font-black text-white leading-tight">
+                                    Complete Your Profile <span className="inline-block animate-bounce">✨</span>
+                                </h2>
+                                <p className="text-indigo-100 font-bold text-lg max-w-xl">
+                                    Add your specialization and bio so students can find you and book appointments with confidence.
+                                </p>
+                            </div>
+                            
+                            <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-indigo-100 uppercase tracking-widest ml-1">Specialization</label>
+                                    <select 
+                                        value={specialization}
+                                        onChange={(e) => setSpecialization(e.target.value)}
+                                        className="w-full bg-white rounded-2xl px-5 py-4 text-slate-800 font-bold focus:ring-4 focus:ring-white/20 outline-none transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="">Select Expertise...</option>
+                                        <option value="Academic Guidance">Academic Guidance</option>
+                                        <option value="Career">Career Counselling</option>
+                                        <option value="Personal">Personal Issues</option>
+                                        <option value="Mental Wellness">Mental Wellness</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-indigo-100 uppercase tracking-widest ml-1">Short Bio</label>
+                                    <textarea 
+                                        value={bio}
+                                        onChange={(e) => setBio(e.target.value)}
+                                        placeholder="Briefly describe your approach..."
+                                        rows={2}
+                                        className="w-full bg-white rounded-2xl px-5 py-4 text-slate-800 font-bold focus:ring-4 focus:ring-white/20 outline-none transition-all resize-none"
+                                    />
+                                </div>
+                                <button 
+                                    onClick={handleQuickSetup}
+                                    disabled={isUpdatingSetup}
+                                    className="w-full bg-white text-indigo-600 font-black py-4 rounded-2xl hover:bg-indigo-50 transition-all active:scale-95 shadow-xl shadow-black/10 disabled:opacity-50 uppercase tracking-widest text-xs"
+                                >
+                                    {isUpdatingSetup ? "Saving Profile..." : "Publish Profile Now"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
