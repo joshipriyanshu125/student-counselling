@@ -85,7 +85,7 @@ function MainLayout({ children }) {
         }
 
         // Initialize Socket for global notifications
-        const socket = io("http://localhost:5000");
+        const socket = io(import.meta.env.VITE_API_URL);
         if (userId) {
             socket.emit("join_own_room", userId);
         }

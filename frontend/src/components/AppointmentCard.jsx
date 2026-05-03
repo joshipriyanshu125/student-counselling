@@ -33,7 +33,7 @@ const AppointmentCard = ({ appointment, updateStatus }) => {
                     <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {appointment.student?.profilePic ? (
                             <img 
-                                src={appointment.student.profilePic.startsWith('http') ? appointment.student.profilePic : `http://localhost:5000${appointment.student.profilePic}`} 
+                                src={appointment.student.profilePic.startsWith('http') ? appointment.student.profilePic : `${import.meta.env.VITE_API_URL}${appointment.student.profilePic}`} 
                                 alt={appointment.student.fullName} 
                                 className="w-full h-full object-cover rounded-xl" 
                             />

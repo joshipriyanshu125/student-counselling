@@ -154,9 +154,9 @@ function Profile() {
                     <img
                         src={
                             profile.profilePic
-                                ? (profile.profilePic.startsWith('http') ? profile.profilePic : `http://localhost:5000${profile.profilePic}`)
+                                ? (profile.profilePic.startsWith('http') ? profile.profilePic : `${import.meta.env.VITE_API_URL}${profile.profilePic}`)
                                 : (localStorage.getItem("profilePic") 
-                                    ? (localStorage.getItem("profilePic").startsWith('http') ? localStorage.getItem("profilePic") : `http://localhost:5000${localStorage.getItem("profilePic")}`)
+                                    ? (localStorage.getItem("profilePic").startsWith('http') ? localStorage.getItem("profilePic") : `${import.meta.env.VITE_API_URL}${localStorage.getItem("profilePic")}`)
                                     : "/default-avatar.png")
                         }
                         alt="Profile"

@@ -174,7 +174,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: (origin, callback) => callback(null, true),
         credentials: true,
     },
 });

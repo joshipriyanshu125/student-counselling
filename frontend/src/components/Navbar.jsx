@@ -67,7 +67,7 @@ function Navbar() {
                 >
                     <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold tracking-wide shadow-sm overflow-hidden">
                         {user?.profilePic ? (
-                            <img src={user.profilePic.startsWith('http') ? user.profilePic : `http://localhost:5000${user.profilePic}`} alt={user.fullName} className="w-full h-full object-cover" />
+                            <img src={user.profilePic.startsWith('http') ? user.profilePic : `${import.meta.env.VITE_API_URL}${user.profilePic}`} alt={user.fullName} className="w-full h-full object-cover" />
                         ) : (
                             getInitials(user?.fullName)
                         )}

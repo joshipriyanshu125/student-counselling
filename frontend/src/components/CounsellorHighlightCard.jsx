@@ -47,7 +47,7 @@ const CounsellorHighlightCard = ({ counsellor, onViewAvailability, onBook, onMes
                     <div className={`w-20 h-20 md:w-24 md:h-24 rounded-[2rem] ${avatarColor} flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-indigo-100 group-hover:scale-105 transition-transform duration-500 overflow-hidden`}>
                         {counsellor.profilePic ? (
                             <img 
-                                src={counsellor.profilePic.startsWith('http') ? counsellor.profilePic : `http://localhost:5000${counsellor.profilePic}`} 
+                                src={counsellor.profilePic.startsWith('http') ? counsellor.profilePic : `${import.meta.env.VITE_API_URL}${counsellor.profilePic}`} 
                                 alt={counsellor.fullName} 
                                 className="w-full h-full object-cover" 
                             />
