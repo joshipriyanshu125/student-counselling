@@ -58,15 +58,18 @@ const BookAppointment = () => {
 
     }, [passedCounsellorId]);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleSubmit = async () => {
+        console.log("Submit clicked", { selectedCounsellor, date, time, type, reason });
 
         if (!selectedCounsellor || !date || !time || !type) {
-            toast.error("Please fill all required fields");
+            toast.error("Please fill all required fields (Counsellor, Date, Time, and Mode)");
             return;
         }
 
+        setIsSubmitting(true);
         try {
-
             const token = localStorage.getItem("token");
 
             const payload = {
@@ -77,7 +80,9 @@ const BookAppointment = () => {
                 reason
             };
 
-            await API.post(
+            console.log("Sending payload:", payload);
+
+            const res = await API.post(
                 "/appointments",
                 payload,
                 {
@@ -87,7 +92,8 @@ const BookAppointment = () => {
                 }
             );
 
-            toast.success("Appointment booked successfully");
+            console.log("Booking response:", res.data);
+            toast.success("Appointment booked successfully!");
 
             setSelectedCounsellor(null);
             setDate("");
@@ -96,15 +102,13 @@ const BookAppointment = () => {
             setReason("");
 
         } catch (error) {
-
-            console.error(error);
-
+            console.error("Booking error details:", error);
             toast.error(
                 error.response?.data?.message || "Failed to book appointment"
             );
-
+        } finally {
+            setIsSubmitting(false);
         }
-
     };
 
     const SimpleCounsellorCard = ({ counsellor, isSelected, onSelect }) => (
@@ -227,9 +231,14 @@ const BookAppointment = () => {
 
                 <button
                     onClick={handleSubmit}
-                    className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-medium py-3 px-6 rounded-xl"
+                    disabled={isSubmitting}
+                    className={`w-full md:w-auto px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg shadow-indigo-100 ${
+                        isSubmitting 
+                        ? "bg-slate-400 cursor-not-allowed text-white" 
+                        : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                    }`}
                 >
-                    Book Appointment
+                    {isSubmitting ? "Processing..." : "Confirm Booking Now"}
                 </button>
 
             </div>
