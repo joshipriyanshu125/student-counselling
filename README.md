@@ -4,13 +4,6 @@ A full-stack web application designed to support students by connecting them wit
 
 ---
 
-## 🚀 Live Demo
-
-* 🌐 Frontend (Vercel): https://student-counselling.vercel.app
-* 🔧 Backend (Render): https://student-counselling-e39x.onrender.com
-
----
-
 ## 📌 Features
 
 * 🔐 User Authentication (Register & Login)
@@ -64,14 +57,6 @@ student-counselling/
 │   └── App.jsx
 │
 └── README.md
-```
-
----
-
-### 🌐 Frontend (.env)
-
-```
-VITE_API_URL=https://student-counselling-e39x.onrender.com
 ```
 
 ---
