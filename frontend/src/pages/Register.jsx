@@ -19,7 +19,8 @@ const Register = () => {
         setIsLoading(true);
 
         try {
-            await API.post("/auth/register", { name, email, password, role });
+            // ✅ FIXED: name → fullName
+            await API.post("/auth/register", { fullName: name, email, password, role });
 
             // ✅ UPDATED MESSAGE
             if (role === "counsellor") {
@@ -30,7 +31,14 @@ const Register = () => {
 
             navigate("/");
         } catch (error) {
-            toast.error("Registration failed. Please try again.");
+            // ✅ Better error handling
+            console.error("Registration Error:", error);
+
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Registration failed. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -133,7 +141,7 @@ const Register = () => {
                                     </div>
                                 </div>
 
-                                {/* ✅ NEW: ROLE SELECT */}
+                                {/* ROLE SELECT */}
                                 <div className="group relative">
                                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">
                                         Register As
