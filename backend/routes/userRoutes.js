@@ -47,14 +47,14 @@ router.put("/profile", protect, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.fullName = req.body.name || req.body.fullName || user.fullName;
-    user.email = req.body.email || user.email;
-    user.phone = req.body.phone || user.phone;
-    user.studentId = req.body.studentId || user.studentId;
-    user.program = req.body.program || user.program;
-    user.specialization = req.body.specialization || user.specialization;
-    user.bio = req.body.bio || user.bio;
-    user.location = req.body.location || user.location;
+    user.fullName = req.body.fullName !== undefined ? req.body.fullName : (req.body.name !== undefined ? req.body.name : user.fullName);
+    user.email = req.body.email !== undefined ? req.body.email : user.email;
+    user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+    user.studentId = req.body.studentId !== undefined ? req.body.studentId : user.studentId;
+    user.program = req.body.program !== undefined ? req.body.program : user.program;
+    user.specialization = req.body.specialization !== undefined ? req.body.specialization : user.specialization;
+    user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+    user.location = req.body.location !== undefined ? req.body.location : user.location;
     user.yearsOfExperience = req.body.yearsOfExperience !== undefined ? req.body.yearsOfExperience : user.yearsOfExperience;
 
     if (req.body.notificationPreferences) {
@@ -88,7 +88,11 @@ router.post(
     upload.single("image")(req, res, (err) => {
       if (err) {
         console.error("Multer/Cloudinary Error:", err);
-        return res.status(400).json({ message: "Upload failed at storage", error: err.message });
+        return res.status(400).json({ 
+          message: "Upload failed at storage", 
+          error: err.message,
+          details: err.http_code ? `Cloudinary Error ${err.http_code}` : "Check your Cloudinary credentials in .env"
+        });
       }
       next();
     });

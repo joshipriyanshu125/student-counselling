@@ -15,12 +15,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        console.log("Preparing upload for user:", req.user?._id);
         return {
             folder: "profile_pics",
+            public_id: `${req.user?._id}`,
             allowedFormats: ["jpg", "png", "jpeg"],
-            resource_type: "auto",
-            public_id: `profile-${req.user?._id}-${Date.now()}`,
+            transformation: [{ width: 500, height: 500, crop: "limit" }],
         };
     },
 });
