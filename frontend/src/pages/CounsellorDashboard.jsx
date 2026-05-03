@@ -192,29 +192,33 @@ const CounsellorDashboard = () => {
                 )}
             </div>
 
-            {/* Quick Setup Card - Only shows if specialization is missing */}
-            {isSetupMissing && !isLoading && (
-                <div className="mb-10 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-                    
-                    <div className="relative z-10">
-                        <div className="flex flex-col lg:flex-row lg:items-center gap-8">
-                            <div className="flex-1 space-y-4">
-                                <h2 className="text-2xl md:text-3xl font-black text-white leading-tight">
-                                    Complete Your Profile <span className="inline-block animate-bounce">✨</span>
-                                </h2>
-                                <p className="text-indigo-100 font-bold text-lg max-w-xl">
-                                    Add your specialization and bio so students can find you and book appointments with confidence.
-                                </p>
+            {/* Professional Profile Quick Management */}
+            {!isLoading && (
+                <div className="mb-10 bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm relative overflow-hidden group">
+                    <div className="flex flex-col lg:flex-row gap-10">
+                        <div className="flex-1 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
+                                    <Star className="w-6 h-6 fill-indigo-600" />
+                                </div>
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Professional Profile</h2>
                             </div>
-                            
-                            <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 space-y-4">
+                            <p className="text-slate-500 font-bold text-lg leading-relaxed">
+                                {specialization 
+                                    ? `You are currently listed as an expert in ${specialization}. You can update your specialization and bio below.`
+                                    : "Complete your professional profile to help students find the right guidance. Your specialization will be shown in the directory."
+                                }
+                            </p>
+                        </div>
+                        
+                        <div className="flex-1 space-y-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-indigo-100 uppercase tracking-widest ml-1">Specialization</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Expertise Field</label>
                                     <select 
                                         value={specialization}
                                         onChange={(e) => setSpecialization(e.target.value)}
-                                        className="w-full bg-white rounded-2xl px-5 py-4 text-slate-800 font-bold focus:ring-4 focus:ring-white/20 outline-none transition-all appearance-none cursor-pointer"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-bold focus:ring-4 focus:ring-indigo-100 focus:bg-white outline-none transition-all appearance-none cursor-pointer"
                                     >
                                         <option value="">Select Expertise...</option>
                                         <option value="Academic Guidance">Academic Guidance</option>
@@ -224,22 +228,25 @@ const CounsellorDashboard = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-indigo-100 uppercase tracking-widest ml-1">Short Bio</label>
-                                    <textarea 
-                                        value={bio}
-                                        onChange={(e) => setBio(e.target.value)}
-                                        placeholder="Briefly describe your approach..."
-                                        rows={2}
-                                        className="w-full bg-white rounded-2xl px-5 py-4 text-slate-800 font-bold focus:ring-4 focus:ring-white/20 outline-none transition-all resize-none"
-                                    />
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Update Info</label>
+                                    <button 
+                                        onClick={handleQuickSetup}
+                                        disabled={isUpdatingSetup}
+                                        className="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100 disabled:opacity-50 uppercase tracking-widest text-[10px]"
+                                    >
+                                        {isUpdatingSetup ? "Saving..." : "Update Profile"}
+                                    </button>
                                 </div>
-                                <button 
-                                    onClick={handleQuickSetup}
-                                    disabled={isUpdatingSetup}
-                                    className="w-full bg-white text-indigo-600 font-black py-4 rounded-2xl hover:bg-indigo-50 transition-all active:scale-95 shadow-xl shadow-black/10 disabled:opacity-50 uppercase tracking-widest text-xs"
-                                >
-                                    {isUpdatingSetup ? "Saving Profile..." : "Publish Profile Now"}
-                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Professional Biography</label>
+                                <textarea 
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    placeholder="Briefly describe your approach and experience..."
+                                    rows={2}
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-bold focus:ring-4 focus:ring-indigo-100 focus:bg-white outline-none transition-all resize-none"
+                                />
                             </div>
                         </div>
                     </div>
