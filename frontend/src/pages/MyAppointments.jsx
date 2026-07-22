@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Video, Phone, Calendar, Clock, User, Plus } from "lucide-react";
+import { Video, Phone, Calendar, Clock, User, Plus, CheckCircle } from "lucide-react";
 import StatusBadge from "../components/StatusBadge";
 import API from "../api/api";
 import toast from "react-hot-toast";
